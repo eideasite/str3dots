@@ -540,7 +540,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
   } else if (page === 'bookmarks') {
     pageContent = <BookmarksPage articles={workspace.articles} bookmarkedIds={bookmarkedArticleIds} shortcutIds={homeShortcutArticleIds} pinnedIds={pinnedArticleIds} onOpen={openArticle} onToggleBookmark={toggleArticleBookmark} onToggleShortcut={toggleHomeArticleShortcut} onTogglePin={toggleArticlePin} />
   } else if (page === 'archive') {
-    pageContent = <ArchivePage articles={workspace.articles.filter((article) => article.archived)} onOpen={openArticle} onAction={handleArticleAction} pinnedIds={pinnedArticleIds} />
+    pageContent = <ArchivePage articles={workspace.articles.filter((article) => article.archived)} onOpen={openArticle} onAction={handleArticleAction} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} />
   } else if (page === 'external-ai-tools') {
     pageContent = <ExternalAiToolsPage />
   } else {

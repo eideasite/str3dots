@@ -44,8 +44,10 @@ export function loadHighlights() {
         articleId: highlight.articleId,
         articleTitle: highlight.articleTitle,
         text: highlight.text,
-        selectedText: highlight.selectedText,
-        createdAt: highlight.createdAt,
+        selectedText: highlight.selectedText === true,
+        createdAt: typeof highlight.createdAt === 'string' && Number.isFinite(Date.parse(highlight.createdAt))
+          ? highlight.createdAt
+          : new Date().toISOString(),
       })) : [],
       updatedAt: typeof item.updatedAt === 'string' && Number.isFinite(Date.parse(item.updatedAt)) ? item.updatedAt : new Date().toISOString(),
     })).filter((item) => item.title || item.items.length || item.articleHighlights.length)

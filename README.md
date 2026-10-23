@@ -28,7 +28,12 @@ There is no backend or configured external publishing, scheduling, or analytics 
 
 ## Latest update (2026-10-23)
 
-- Refined the responsive writing workspace and compact article controls.
+- Refined the dashboard layout for desktop, tablet, and mobile, with section dividers, rounded cards, and a responsive navigation drawer.
+- Recent Posts shows the total post count, per-day post numbers, and clearly separated author, date, and post content details.
+- Untitled article cards use ordered English labels such as `Article Sample 1`; these labels do not overwrite saved article titles.
+- Aligned post avatars with author names and improved card spacing and wrapping on narrow screens.
+- Added the responsive footer with copyright and contact details.
+- Refined the article editor toolbar and writing surface for small screens and horizontal text flow.
 - Improved accessibility settings, date and article metrics handling, and local storage recovery.
 - Hardened image imports and rich-text handling, including pending-read cleanup and safer editor updates.
 - Verified with `npm run lint` and `npm run build`.

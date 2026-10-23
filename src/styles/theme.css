@@ -8,6 +8,9 @@
   --surface: #ffffff;
   --surface-muted: #f5f5f5;
   --surface-selected: rgba(135, 190, 145, 0.2);
+  --ui-radius-control: 12px;
+  --ui-radius-card: 18px;
+  --ui-radius-panel: 20px;
   --text-subtle: #666666;
   --editor-text: #292929;
   --app-font-scale: 1;
@@ -26,7 +29,7 @@
   color-scheme: dark;
   --ink: #eeeeee;
   --muted: #aaaaaa;
-  --line: #ffffff;
+  --line: #3a3a3a;
   --line-hover: #c9a7ff;
   --page-bg: #101010;
   --surface: #1b1b1b;

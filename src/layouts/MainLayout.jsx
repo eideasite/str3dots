@@ -7,7 +7,7 @@ import LoadingState from '../components/common/LoadingState.jsx'
 import { useConnectivityStatus } from '../hooks/useConnectivityStatus.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
-const { Content, Sider } = Layout
+const { Content } = Layout
 const navItems = [
   { key: 'compose', icon: <FileTextOutlined />, label: 'Write a Post' },
   { key: 'editor', icon: <FileTextOutlined />, label: 'Article Editor' },
@@ -48,6 +48,9 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
         : estimateType || t('Network speed estimate unavailable')
   const networkInfoContent = (
     <div className="network-estimate-info">
+      {liveSpeedTest?.status === 'error' && (
+        <Typography.Text type="warning">{t(liveSpeedTest.message)}</Typography.Text>
+      )}
       {liveSpeedTest?.status === 'success'
         ? <span className="network-estimate-metrics">{liveTestMetrics.map(({ kind, label }) => <span key={kind} className={`network-estimate-pill network-estimate-pill-${kind}`}>{label}</span>)}</span>
         : networkDetails.length
@@ -73,11 +76,6 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
     : saveStatus === 'error' ? t('Could not save') : saveStatus === 'saving' ? <LoadingState message={t('Saving draft...')} /> : t('Saved in this browser')
   return (
     <Layout className={`app-layout${focusMode ? ' app-layout-focus' : ''}`}>
-      <Sider className="app-sider" width={232} breakpoint="lg" collapsedWidth={0}>
-        {profileBrand}
-        {menu}
-        <div className={`sider-note sider-note-${saveStatus}`} role="status"><span className={`storage-indicator ${saveStatus}`} />{saveMessage}</div>
-      </Sider>
       <Layout className="app-main-layout">
         <AppHeader onOpenMenu={() => setMobileNavOpen(true)} themeMode={themeMode} onThemeChange={onThemeChange} language={language} onLanguageChange={onLanguageChange} profile={profile} onNavigate={onNavigate} onLock={onLock} onSignOut={onSignOut} />
         <Content className="app-content">
@@ -118,9 +116,25 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
           />}
           {online && showRestored && <Alert className="connectivity-status connectivity-restored" banner showIcon type="success" role="status" message={t('The browser reports that a connection is available again.')} description={t('This does not confirm that every online service is reachable.')} />}
           {children}
+          <footer className="app-footer">
+            <span>© {new Date().getFullYear()} Jeyamohan. {t('All rights reserved.')}</span>
+            <span>
+              {t('Contact:')}{' '}
+              <a href="mailto:jeyamohan98@gmail.com">jeyamohan98@gmail.com</a>
+            </span>
+          </footer>
         </Content>
       </Layout>
-      <Drawer title="Jeyamohan Articles" open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} placement="left" width={280}>{profileBrand}{menu}</Drawer>
+      <Drawer title="Jeyamohan Articles" open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} placement="left" width={280}>
+        <div className="app-drawer-navigation">
+          {profileBrand}
+          {menu}
+          <div className={`sider-note sider-note-${saveStatus}`} role="status">
+            <span className={`storage-indicator ${saveStatus}`} />
+            {saveMessage}
+          </div>
+        </div>
+      </Drawer>
     </Layout>
   )
 }

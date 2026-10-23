@@ -6,5 +6,10 @@ const statusLabels = { draft: 'Draft', scheduled: 'Scheduled locally', published
 export default function ArticleStatusTag({ status }) {
   const { t } = useLanguage()
   const safeStatus = Object.hasOwn(statusLabels, status) ? status : 'draft'
-  return <Tag className={`status-tag status-${safeStatus}`} role="status">{t(statusLabels[safeStatus])}</Tag>
+
+  return (
+    <Tag className={`status-tag status-${safeStatus}`} role="status">
+      {t(statusLabels[safeStatus])}
+    </Tag>
+  )
 }

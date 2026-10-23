@@ -23,7 +23,7 @@ import { richTextToPlainText } from './richText.js'
 const wordSegmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'word' }) : null
 const graphemeSegmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null
 
-export const getArticleTitle = (article) => (typeof article?.title === 'string' ? article.title.trim() : '') || 'தலைப்பில்லாத கட்டுரை'
+export const getArticleTitle = (article) => (typeof article?.title === 'string' ? article.title.trim() : '') || 'Untitled article'
 
 export const getWordCountFromText = (text = '') => {
   const normalizedText = typeof text === 'string' ? text.trim() : ''

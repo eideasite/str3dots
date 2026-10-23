@@ -5,6 +5,13 @@ import { notifyAppError } from '../../services/errorNotifications.js'
 import { richTextToHtml, richTextToPlainText, sanitizeRichTextHtml } from '../../utils/richText.js'
 import { useLanguage } from '../../context/LanguageContext.jsx'
 
+const ACCEPTED_PASTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+const MAX_PASTED_IMAGE_SIZE = 4 * 1024 * 1024
+
+function isLegacyObjectPlaceholder(value) {
+  return typeof value === 'string' && richTextToPlainText(value).trim() === '[object Object]'
+}
+
 const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChange, onSelectionChange }, forwardedRef) {
   const { message } = App.useApp()
   const { t } = useLanguage()
@@ -22,8 +29,7 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
     // Older saves may contain the literal result of String(an editor object).
     // Treat that exact, content-only artifact as empty so the editable canvas
     // opens cleanly; leave persisted data untouched until the user types.
-    const isObjectPlaceholder = typeof value === 'string' && richTextToPlainText(value).trim() === '[object Object]'
-    const safeHtml = isObjectPlaceholder ? '' : richTextToHtml(value || '')
+    const safeHtml = isLegacyObjectPlaceholder(value) ? '' : richTextToHtml(value || '')
     if (editor.innerHTML !== safeHtml) editor.innerHTML = safeHtml
   }, [value])
 
@@ -37,7 +43,7 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
     const editor = event.currentTarget
     const safeHtml = sanitizeRichTextHtml(editor.innerHTML)
     if (editor.innerHTML !== safeHtml) editor.innerHTML = safeHtml
-    if (!editedRef.current && typeof value === 'string' && richTextToPlainText(value).trim() === '[object Object]') return
+    if (!editedRef.current && isLegacyObjectPlaceholder(value)) return
     if (typeof value !== 'string' && !editedRef.current) return
     if (safeHtml !== (typeof value === 'string' ? value : '')) onChange(safeHtml)
     editedRef.current = false
@@ -49,12 +55,11 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
     if (imageItem) {
       event.preventDefault()
       const imageFile = imageItem.getAsFile()
-      const acceptedTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
-      if (!imageFile || !acceptedTypes.includes(imageFile.type)) {
+      if (!imageFile || !ACCEPTED_PASTED_IMAGE_TYPES.includes(imageFile.type)) {
         message.warning(t('Paste a PNG, JPEG, GIF, or WebP image.'))
         return
       }
-      if (imageFile.size > 4 * 1024 * 1024) {
+      if (imageFile.size > MAX_PASTED_IMAGE_SIZE) {
         message.warning(t('Pasted images must be 4 MB or smaller for local draft storage.'))
         return
       }
@@ -98,7 +103,7 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
       ref={setEditorRef}
       className="article-body-input article-rich-editor"
       role="textbox"
-      aria-label="Article body"
+      aria-label={t('Article body')}
       aria-multiline="true"
       contentEditable
       suppressContentEditableWarning

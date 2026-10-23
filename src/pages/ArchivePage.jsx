@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 
 const { Title, Text, Paragraph } = Typography
 
-export default function ArchivePage({ articles, onOpen, onAction, pinnedIds = [] }) {
+export default function ArchivePage({ articles, onOpen, onAction, pinnedIds = [], onTogglePin }) {
   const { t } = useLanguage()
   return (
     <div className="page-wrap">
@@ -15,7 +15,7 @@ export default function ArchivePage({ articles, onOpen, onAction, pinnedIds = []
         <Paragraph>{t('Archived articles are kept here until you restore them.')}</Paragraph>
       </div>
       <Card className="surface-card list-card">
-        <ArticleList articles={articles} filter="all" onOpen={onOpen} onAction={onAction} pinnedIds={pinnedIds} emptyDescription={t('No archived articles yet')} />
+        <ArticleList articles={articles} filter="all" onOpen={onOpen} onAction={onAction} pinnedIds={pinnedIds} onTogglePin={onTogglePin} emptyDescription={t('No archived articles yet')} />
       </Card>
     </div>
   )
