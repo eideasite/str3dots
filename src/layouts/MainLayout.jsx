@@ -2,17 +2,12 @@ import { useState } from 'react'
 import { Alert, Button, Drawer, Layout, Menu, Popover, Typography } from 'antd'
 import { InboxOutlined, BookOutlined, FileTextOutlined, InfoCircleOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons'
 import AppHeader from '../components/common/AppHeader.jsx'
+import { GeminiMark } from '../components/common/AiBrandIcons.jsx'
 import LoadingState from '../components/common/LoadingState.jsx'
 import { useConnectivityStatus } from '../hooks/useConnectivityStatus.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
 const { Content, Sider } = Layout
-function GeminiMark() {
-  return <svg className="ai-brand-mark ai-brand-gemini" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gemini-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f9ab00" /><stop offset=".32" stopColor="#ea4335" /><stop offset=".68" stopColor="#a142f4" /><stop offset="1" stopColor="#4285f4" /></linearGradient></defs><path fill="url(#gemini-gradient)" d="M24 2c3.7 12.1 9.9 18.3 22 22-12.1 3.7-18.3 9.9-22 22C20.3 33.9 14.1 27.7 2 24 14.1 20.3 20.3 14.1 24 2Z" /></svg>
-}
-function GoogleMark() {
-  return <span className="ai-brand-mark ai-brand-google" aria-hidden="true">G</span>
-}
 const navItems = [
   { key: 'compose', icon: <FileTextOutlined />, label: 'Write a Post' },
   { key: 'editor', icon: <FileTextOutlined />, label: 'Article Editor' },
@@ -24,7 +19,7 @@ const navItems = [
   { key: 'external-ai-tools', icon: <GeminiMark />, label: 'External AI tools' },
 ]
 
-export default function MainLayout({ page, onNavigate, saveStatus, workspaceRecoveryState, onDownloadRecoveryCopy, themeMode, onThemeChange, language, onLanguageChange, profile, onLock, onSignOut, children }) {
+export default function MainLayout({ page, focusMode = false, onNavigate, saveStatus, workspaceRecoveryState, onDownloadRecoveryCopy, themeMode, onThemeChange, language, onLanguageChange, profile, onLock, onSignOut, children }) {
   const { t } = useLanguage()
   const { online, showRestored, checkConnection, checkResult, networkEstimate, liveSpeedTest, refreshingEstimate, refreshNetworkEstimate } = useConnectivityStatus()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -75,9 +70,9 @@ export default function MainLayout({ page, onNavigate, saveStatus, workspaceReco
   const menu = <Menu mode="inline" selectedKeys={[page === 'published' ? 'articles' : page]} items={navItems.map((item) => ({ ...item, label: t(item.label) }))} onClick={({ key }) => selectPage(key)} />
   const saveMessage = saveStatus === 'conflict'
     ? t('Another tab changed this workspace. Saving here is paused to protect its newer data.')
-    : saveStatus === 'error' ? t('Could not save') : saveStatus === 'saving' ? <LoadingState /> : t('Saved in this browser')
+    : saveStatus === 'error' ? t('Could not save') : saveStatus === 'saving' ? <LoadingState message={t('Saving draft...')} /> : t('Saved in this browser')
   return (
-    <Layout className="app-layout">
+    <Layout className={`app-layout${focusMode ? ' app-layout-focus' : ''}`}>
       <Sider className="app-sider" width={232} breakpoint="lg" collapsedWidth={0}>
         {profileBrand}
         {menu}

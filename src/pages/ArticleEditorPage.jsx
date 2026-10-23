@@ -5,13 +5,14 @@ import ArticleBodyEditor from '../components/editor/ArticleBodyEditor.jsx'
 import ArticleStatusTag from '../components/common/ArticleStatusTag.jsx'
 import ArticleTitleInput from '../components/editor/ArticleTitleInput.jsx'
 import EditorToolbar, { EditorFormatToolbar } from '../components/editor/EditorToolbar.jsx'
-import { formatDate } from '../utils/formatDate.js'
+import { getReadingMinutesFromWordCount, getWordCountFromText } from '../utils/article.js'
+import { formatDate, getDateLocale } from '../utils/formatDate.js'
 import { escapeHtml, isSafeRichTextUrl, richTextToPlainText, sanitizeRichTextHtml } from '../utils/richText.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
 const { Text } = Typography
 
-export default function ArticleEditorPage({ article, saveStatus, onSaveDraft, onChange, onOpenSeo, onManage, onCreate, onDiscard, onBackHome, onPreview, onDownloadPdf }) {
+export default function ArticleEditorPage({ article, saveStatus, focusMode = false, onToggleFocus, onSaveDraft, onChange, onOpenSeo, onManage, onCreate, onDiscard, onBackHome, onPreview, onDownloadPdf }) {
   const { t, language } = useLanguage()
   const bodyRef = useRef(null)
   const savedRange = useRef(null)
@@ -160,11 +161,11 @@ export default function ArticleEditorPage({ article, saveStatus, onSaveDraft, on
   if (!article) return <div className="page-wrap editor-page"><Card className="surface-card"><Typography.Title level={3}>{t('No article is open')}</Typography.Title><Typography.Paragraph>{t('Open a draft from Articles Management or create a new article.')}</Typography.Paragraph><div className="form-actions"><Button type="primary" onClick={onCreate}>{t('Create new article')}</Button><Button onClick={onManage}>{t('View articles')}</Button></div></Card></div>
 
   const plainBody = richTextToPlainText(deferredBody)
-  const words = plainBody ? plainBody.split(/\s+/u).length : 0
-  const readingMinutes = Math.max(1, Math.ceil(words / 200))
+  const words = getWordCountFromText(plainBody)
+  const readingMinutes = getReadingMinutesFromWordCount(words)
   return (
     <div className="page-wrap editor-page">
-      <EditorToolbar article={article} onOpenSeo={onOpenSeo} onManage={onManage} onDiscard={onDiscard} onBackHome={onBackHome} onSaveDraft={onSaveDraft} onPreview={onPreview} onDownloadPdf={onDownloadPdf} onAskGemini={() => setGeminiOpen(true)} />
+      <EditorToolbar article={article} focusMode={focusMode} onToggleFocus={onToggleFocus} onOpenSeo={onOpenSeo} onManage={onManage} onDiscard={onDiscard} onBackHome={onBackHome} onSaveDraft={onSaveDraft} onPreview={onPreview} onDownloadPdf={onDownloadPdf} onAskGemini={() => setGeminiOpen(true)} />
       <Alert
         className="local-notice editor-save-status"
         showIcon
@@ -183,7 +184,7 @@ export default function ArticleEditorPage({ article, saveStatus, onSaveDraft, on
         </div>
         <div className="editor-footer"><Text type="secondary">{plainBody.length} {t('characters')}</Text><Text type="secondary">{words} {t('words')} | {readingMinutes} {t('min read')}</Text></div>
       </Card>
-      <div className="editor-bottom-note"><Statistic title={t('Last updated')} value={formatDate(article.updatedAt, { dateStyle: 'medium', timeStyle: 'short' }, language === 'ta' ? 'ta-LK' : 'en-US')} /></div>
+      <div className="editor-bottom-note"><Statistic title={t('Last updated')} value={formatDate(article.updatedAt, { dateStyle: 'medium', timeStyle: 'short' }, getDateLocale(language))} /></div>
       <Drawer
         className="gemini-writing-drawer"
         title={<span><RobotOutlined /> {t('Ask Gemini')}</span>}

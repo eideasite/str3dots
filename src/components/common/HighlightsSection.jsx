@@ -3,7 +3,8 @@ import { useRef, useState } from 'react'
 import { Button, Empty, Input, Modal, Popconfirm, Space, Typography, message } from 'antd'
 import { ArrowLeftOutlined, CheckOutlined, DeleteOutlined, EditOutlined, LeftOutlined, PictureOutlined, PlusOutlined, RightOutlined, StarOutlined, UploadOutlined } from '@ant-design/icons'
 import { createHighlightCollection } from '../../services/highlightStorage.js'
-import { formatDate } from '../../utils/formatDate.js'
+import { formatDate, getDateLocale } from '../../utils/formatDate.js'
+import { createId } from '../../utils/createId.js'
 import { useLanguage } from '../../context/LanguageContext.jsx'
 import ProfileAvatar from './ProfileAvatar.jsx'
 
@@ -50,7 +51,7 @@ function compactImage(image) {
 function readImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = () => resolve({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, src: String(reader.result), name: file.name })
+    reader.onload = () => resolve({ id: createId('highlight-image'), src: String(reader.result), name: file.name })
     reader.onerror = reject
     reader.readAsDataURL(file)
   })
@@ -60,6 +61,7 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
   const { t, language } = useLanguage()
   const carouselRef = useRef(null)
   const fileRef = useRef(null)
+  const readingImagesRef = useRef(false)
   const [view, setView] = useState(null)
   const [editing, setEditing] = useState(null)
   const [readingImages, setReadingImages] = useState(false)
@@ -76,7 +78,8 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
   }
 
   const addImages = async (event) => {
-    if (savingCollection) return
+    if (savingCollection || readingImagesRef.current || !editing) return
+    const collectionId = editing.id
     const files = Array.from(event.target.files || [])
     event.target.value = ''
     if (!files.length) return
@@ -87,13 +90,15 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
     const accepted = files.filter((file) => ACCEPTED_IMAGES.includes(file.type) && file.size <= MAX_IMAGE_SIZE)
     if (accepted.length !== files.length) message.warning(t('Choose PNG, JPEG, GIF, or WebP photos up to 4 MB each.'))
     if (!accepted.length) return
+    readingImagesRef.current = true
     setReadingImages(true)
     try {
       const images = await Promise.all(accepted.map(readImage))
-      setEditing((current) => current ? { ...current, items: [...current.items, ...images] } : current)
+      setEditing((current) => current?.id === collectionId ? { ...current, items: [...current.items, ...images] } : current)
     } catch {
       notifyAppError(t('Could not read one of those photos.'))
     } finally {
+      readingImagesRef.current = false
       setReadingImages(false)
     }
   }
@@ -187,7 +192,7 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
           {highlights.length ? highlights.map((collection) => (
             <div className="highlight-manager-row" key={collection.id}>
               <HighlightImage className="highlight-manager-cover" src={collection.items[0]?.src} alt="" fallbackLabel={t('Photo unavailable')} />
-              <div className="highlight-manager-info"><Typography.Text strong>{collection.title}</Typography.Text><Typography.Text type="secondary">{collection.items.length} {t('photos')} · {(collection.articleHighlights || []).length} {t('saved text highlights')}</Typography.Text><Typography.Text type="secondary">{t('Updated')} {formatDate(collection.updatedAt, { dateStyle: 'medium' }, language === 'ta' ? 'ta-LK' : 'en-US')}</Typography.Text></div>
+              <div className="highlight-manager-info"><Typography.Text strong>{collection.title}</Typography.Text><Typography.Text type="secondary">{collection.items.length} {t('photos')} · {(collection.articleHighlights || []).length} {t('saved text highlights')}</Typography.Text><Typography.Text type="secondary">{t('Updated')} {formatDate(collection.updatedAt, { dateStyle: 'medium' }, getDateLocale(language))}</Typography.Text></div>
               <Button type="text" aria-label={`${t('Edit')} ${collection.title}`} icon={<EditOutlined />} onClick={() => beginEdit(collection)} />
             </div>
           )) : <Empty description={t('No highlights yet')} />}

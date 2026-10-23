@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef } from 'react'
+import { forwardRef, useCallback, useEffect, useRef } from 'react'
 import { App } from 'antd'
 
 import { notifyAppError } from '../../services/errorNotifications.js'
@@ -10,6 +10,11 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
   const { t } = useLanguage()
   const localRef = useRef(null)
   const editedRef = useRef(false)
+  const setEditorRef = useCallback((node) => {
+    localRef.current = node
+    if (typeof forwardedRef === 'function') forwardedRef(node)
+    else if (forwardedRef) forwardedRef.current = node
+  }, [forwardedRef])
 
   useEffect(() => {
     const editor = localRef.current
@@ -62,16 +67,21 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
       }
       const reader = new FileReader()
       reader.onload = () => {
+        if (!editor.isConnected || !editor.contains(range.commonAncestorContainer)) return
+        const shouldRestoreSelection = document.activeElement === editor
+          && selection?.anchorNode
+          && editor.contains(selection.anchorNode)
         const image = document.createElement('img')
         image.src = String(reader.result)
         image.alt = imageFile.name || 'Pasted image'
         range.deleteContents()
         range.insertNode(image)
-        range.setStartAfter(image)
-        range.collapse(true)
-        selection?.removeAllRanges()
-        selection?.addRange(range)
-        editor.focus()
+        if (shouldRestoreSelection) {
+          range.setStartAfter(image)
+          range.collapse(true)
+          selection.removeAllRanges()
+          selection.addRange(range)
+        }
         editor.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste' }))
       }
       reader.onerror = () => notifyAppError(t('Could not read the pasted image.'))
@@ -85,7 +95,7 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
 
   return (
     <div
-      ref={(node) => { localRef.current = node; if (typeof forwardedRef === 'function') forwardedRef(node); else if (forwardedRef) forwardedRef.current = node }}
+      ref={setEditorRef}
       className="article-body-input article-rich-editor"
       role="textbox"
       aria-label="Article body"

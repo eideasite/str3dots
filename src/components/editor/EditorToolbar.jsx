@@ -9,6 +9,8 @@ import {
   DownOutlined,
   EyeOutlined,
   FilePdfOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
   ItalicOutlined,
   LinkOutlined,
   OrderedListOutlined,
@@ -106,7 +108,7 @@ export function EditorFormatToolbar({ onFormat, activeFormats = {} }) {
   )
 }
 
-export default function EditorToolbar({ article, onOpenSeo, onManage, onDiscard, onBackHome, onSaveDraft, onPreview, onDownloadPdf, onAskGemini }) {
+export default function EditorToolbar({ article, focusMode = false, onToggleFocus, onOpenSeo, onManage, onDiscard, onBackHome, onSaveDraft, onPreview, onDownloadPdf, onAskGemini }) {
   const { t } = useLanguage()
   const manageItems = [
     { key: 'articles', label: t('Articles Management') },
@@ -121,6 +123,9 @@ export default function EditorToolbar({ article, onOpenSeo, onManage, onDiscard,
         <Typography.Paragraph>{t('Write and edit your article. Your draft is saved in this browser.')}</Typography.Paragraph>
       </div>
       <div className="editor-flow-actions">
+        <Tooltip title={t(focusMode ? 'Exit focus mode' : 'Focus mode')}>
+          <Button className="editor-focus-toggle" type={focusMode ? 'primary' : 'default'} icon={focusMode ? <FullscreenExitOutlined /> : <FullscreenOutlined />} aria-label={t(focusMode ? 'Exit focus mode' : 'Focus mode')} aria-pressed={focusMode} onClick={onToggleFocus} />
+        </Tooltip>
         <Button type="text" className="editor-back-home-button" icon={<ArrowLeftOutlined />} onClick={onBackHome}>{t('Back')}</Button>
         <Button className="editor-save-draft-button" icon={<SaveOutlined />} onClick={onSaveDraft}>{t('Save Draft')}</Button>
         <Button className="editor-preview-button" icon={<EyeOutlined />} onClick={onPreview}>{t('Preview')}</Button>

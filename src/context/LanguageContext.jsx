@@ -12,6 +12,7 @@ const tamil = {
   'This creates a local post in this browser only.': 'இந்த இடுகை இந்த உலாவியில் மட்டும் சேமிக்கப்படும்.',
   'Could not save this post in this browser.': 'இந்த உலாவியில் இடுகையைச் சேமிக்க முடியவில்லை.',
   'Write Article': 'கட்டுரை எழுதுக', Profile: 'சுயவிவரம்', 'Article Editor': 'கட்டுரை திருத்தி',
+  'Focus mode': 'கவனக் குவிப்பு முறை', 'Exit focus mode': 'கவனக் குவிப்பு முறையை விட்டு வெளியேறு',
   'SEO Settings': 'SEO அமைப்புகள்', 'Published Post': 'வெளியிடப்பட்ட கட்டுரை', 'Articles Management': 'கட்டுரைகள் நிர்வாகம்',
   'Open navigation': 'வழிசெலுத்தலைத் திறக்கவும்', 'Switch to light mode': 'பகல் பயன்முறைக்கு மாற்றவும்',
   'Choose language': 'மொழியைத் தேர்ந்தெடுக்கவும்',
@@ -87,6 +88,7 @@ const tamil = {
   'Could not publish this article. Your draft is still saved.': '\u0b95\u0b9f\u0bcd\u0b9f\u0bc1\u0bb0\u0bc8\u0baf\u0bc8 \u0bb5\u0bc6\u0bb3\u0bbf\u0baf\u0bbf\u0b9f \u0bae\u0bc1\u0b9f\u0bbf\u0baf\u0bb5\u0bbf\u0bb2\u0bcd\u0bb2\u0bc8. \u0bb5\u0bb0\u0bc8\u0bb5\u0bc1 \u0b87\u0ba9\u0bcd\u0ba9\u0bc1\u0bae\u0bcd \u0b9a\u0bc7\u0bae\u0bbf\u0b95\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1\u0bb3\u0bcd\u0bb3\u0ba4\u0bc1.',
   'Could not save this schedule. Your draft is still saved.': '\u0b85\u0b9f\u0bcd\u0b9f\u0bb5\u0ba3\u0bc8\u0baf\u0bc8\u0b9a\u0bcd \u0b9a\u0bc7\u0bae\u0bbf\u0b95\u0bcd\u0b95 \u0bae\u0bc1\u0b9f\u0bbf\u0baf\u0bb5\u0bbf\u0bb2\u0bcd\u0bb2\u0bc8. \u0bb5\u0bb0\u0bc8\u0bb5\u0bc1 \u0b87\u0ba9\u0bcd\u0ba9\u0bc1\u0bae\u0bcd \u0b9a\u0bc7\u0bae\u0bbf\u0b95\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1\u0bb3\u0bcd\u0bb3\u0ba4\u0bc1.',
   'The schedule was saved in this browser only.': 'திட்ட நேரம் இந்த உலாவியில் மட்டும் சேமிக்கப்பட்டது.', 'Draft discarded.': 'வரைவு நீக்கப்பட்டது.',
+  'Something went wrong': 'ஏதோ தவறு ஏற்பட்டது', 'The page encountered an error. Your saved browser data is unchanged.': 'இந்தப் பக்கத்தில் பிழை ஏற்பட்டது. உலாவியில் சேமித்த தரவு மாற்றப்படவில்லை.', 'Try again': 'மீண்டும் முயற்சிக்கவும்',
   'Page not found': 'பக்கம் கிடைக்கவில்லை', 'Go back to your articles.': 'உங்கள் கட்டுரைகள் பக்கத்திற்குத் திரும்புங்கள்.', 'Go to articles': 'கட்டுரைகளுக்குச் செல்லவும்',
 }
 

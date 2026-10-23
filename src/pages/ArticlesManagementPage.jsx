@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { Card, Segmented, Typography } from 'antd'
+import { Button, Card, Segmented, Typography } from 'antd'
 import { FileAddOutlined } from '@ant-design/icons'
-import AppButton from '../components/common/AppButton.jsx'
 import ArticleList from '../components/articles/ArticleList.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
@@ -20,7 +19,7 @@ export default function ArticlesManagementPage({ articles, onCreate, onOpen, onA
     <div className="page-wrap">
       <div className="page-heading page-heading-row">
         <div><Text className="eyebrow">{t('Your writing')}</Text><Title level={2}>{t('Articles')}</Title><Paragraph>{t('Manage drafts and locally published articles.')}</Paragraph></div>
-        <AppButton type="primary" icon={<FileAddOutlined />} onClick={onCreate}>{t('New article')}</AppButton>
+        <Button type="primary" icon={<FileAddOutlined />} onClick={onCreate}>{t('New article')}</Button>
       </div>
       <Card className="surface-card list-card">
         <div className="list-toolbar"><Segmented options={filters.map((item) => ({ ...item, label: t(item.label) }))} value={filter} onChange={setFilter} /></div>

@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+Microsoft/Windows/PowerShell/ModuleAnalysisCache
 
 # Editor directories and files
 .vscode/*

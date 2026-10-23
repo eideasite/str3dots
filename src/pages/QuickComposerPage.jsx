@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Card, Empty, Input, Modal, Popover, Space, Spin, Tooltip, Typography, message } from 'antd'
 import { AudioOutlined, FileTextOutlined, PictureOutlined, SmileOutlined } from '@ant-design/icons'
 
 import { notifyAppError } from '../services/errorNotifications.js'
-import { formatDate } from '../utils/formatDate.js'
+import { formatDate, getDateLocale } from '../utils/formatDate.js'
 import { waitForPostingMinimum } from '../services/publishingService.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import HighlightsSection from '../components/common/HighlightsSection.jsx'
@@ -25,8 +25,12 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
   const [showAllPosts, setShowAllPosts] = useState(false)
   const fileInputRef = useRef(null)
   const recognitionRef = useRef(null)
+  const imageReaderRef = useRef(null)
 
-  useEffect(() => () => recognitionRef.current?.stop(), [])
+  useEffect(() => () => {
+    recognitionRef.current?.stop()
+    imageReaderRef.current?.abort()
+  }, [])
 
   const toggleDictation = (openComposer = false) => {
     if (dictating) {
@@ -102,9 +106,19 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
       message.warning(t('Choose a PNG, JPEG, GIF, or WebP image up to 4 MB.'))
       return
     }
+    imageReaderRef.current?.abort()
     const reader = new FileReader()
-    reader.onload = () => setImage({ src: String(reader.result), name: file.name })
-    reader.onerror = () => notifyAppError(t('Could not read that image.'))
+    imageReaderRef.current = reader
+    reader.onload = () => {
+      if (imageReaderRef.current !== reader) return
+      imageReaderRef.current = null
+      setImage({ src: String(reader.result), name: file.name })
+    }
+    reader.onerror = () => {
+      if (imageReaderRef.current !== reader) return
+      imageReaderRef.current = null
+      notifyAppError(t('Could not read that image.'))
+    }
     reader.readAsDataURL(file)
   }
 
@@ -114,13 +128,21 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
   }
 
   const emojiPicker = <div className="quick-composer-emoji-list">{EMOJIS.map((emoji) => <Button key={emoji} type="text" aria-label={`Insert ${emoji}`} onClick={() => setText((current) => `${current}${emoji}`)}>{emoji}</Button>)}</div>
-  const recentPosts = posts
-    .slice()
-    .sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt))
+  const recentPosts = useMemo(
+    () => posts.slice().sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt)),
+    [posts],
+  )
   const visiblePosts = showAllPosts ? recentPosts : recentPosts.slice(0, 3)
-  const activeArticles = articles.filter((article) => !article.archived)
-  const shortcutArticles = shortcutIds.map((id) => articles.find((article) => article.id === id)).filter((article) => article && !article.archived)
-  const missingShortcutCount = shortcutIds.filter((id) => !articles.some((article) => article.id === id)).length
+  const activeArticles = useMemo(() => articles.filter((article) => !article.archived), [articles])
+  const articlesById = useMemo(() => new Map(articles.map((article) => [article.id, article])), [articles])
+  const shortcutArticles = useMemo(
+    () => shortcutIds.map((id) => articlesById.get(id)).filter((article) => article && !article.archived),
+    [articlesById, shortcutIds],
+  )
+  const missingShortcutCount = useMemo(
+    () => shortcutIds.filter((id) => !articlesById.has(id)).length,
+    [articlesById, shortcutIds],
+  )
 
   return (
     <main className="quick-composer-page">
@@ -168,7 +190,7 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
                   <ProfileAvatar profile={profile} className="quick-composer-avatar" />
                   <div className="home-post-author-info">
                     <Typography.Text strong>{profile.name || t('Writer')}</Typography.Text>
-                    <Typography.Text type="secondary">{formatDate(post.createdAt, { dateStyle: 'medium', timeStyle: 'short' }, language === 'ta' ? 'ta-LK' : 'en-US')} · {t('Local post')}</Typography.Text>
+                    <Typography.Text type="secondary">{formatDate(post.createdAt, { dateStyle: 'medium', timeStyle: 'short' }, getDateLocale(language))} · {t('Local post')}</Typography.Text>
                   </div>
                 </div>
                 {post.text && <div className="home-post-body">{post.text}</div>}

@@ -1,15 +1,8 @@
 import { useState } from 'react'
 import { Button, Card, Modal, Tooltip, Typography } from 'antd'
 import { InfoCircleOutlined } from '@ant-design/icons'
+import { GeminiMark, GoogleMark } from '../components/common/AiBrandIcons.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
-
-function GeminiMark() {
-  return <svg className="ai-brand-mark ai-brand-gemini" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="external-gemini-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f9ab00" /><stop offset=".32" stopColor="#ea4335" /><stop offset=".68" stopColor="#a142f4" /><stop offset="1" stopColor="#4285f4" /></linearGradient></defs><path fill="url(#external-gemini-gradient)" d="M24 2c3.7 12.1 9.9 18.3 22 22-12.1 3.7-18.3 9.9-22 22C20.3 33.9 14.1 27.7 2 24 14.1 20.3 20.3 14.1 24 2Z" /></svg>
-}
-
-function GoogleMark() {
-  return <span className="ai-brand-mark ai-brand-google" aria-hidden="true">G</span>
-}
 
 export default function ExternalAiToolsPage() {
   const { t } = useLanguage()

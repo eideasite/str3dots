@@ -454,6 +454,35 @@
   .article-preview-modal { max-width: calc(100vw - 24px); margin-inline: 12px; }
 }
 
+/* Keep the writing canvas and its formatting tools available in focus mode. */
+.app-layout-focus .editor-page { width: min(1440px, calc(100% - 64px)); padding-top: 16px; }
+.app-layout-focus .editor-flow-toolbar { min-height: 48px; justify-content: flex-end; margin-bottom: 12px; padding: 0 0 8px; }
+.app-layout-focus .editor-flow-copy,
+.app-layout-focus .editor-flow-actions > :not(.editor-focus-toggle),
+.app-layout-focus .editor-bottom-note { display: none !important; }
+.app-layout-focus .editor-flow-actions { flex: 0 0 auto; }
+.app-layout-focus .editor-flow-actions .editor-focus-toggle { width: 44px; height: 40px; padding: 0; border-radius: 10px; }
+.app-layout-focus .editor-save-status { margin-bottom: 10px; }
+.app-layout-focus .editor-save-status .ant-alert-description { display: none; }
+.app-layout-focus .article-rich-editor { height: clamp(420px, 72dvh, 1000px); min-height: 420px; }
+.app-layout-focus .editor-format-toolbar { top: 16px; max-height: calc(100dvh - 32px); }
+
+@media (max-width: 900px) {
+  .app-layout-focus .editor-page { width: calc(100% - 40px); padding-top: 12px; }
+  .app-layout-focus .editor-flow-toolbar { align-items: flex-end; flex-direction: row; }
+  .app-layout-focus .editor-flow-actions { width: auto; }
+  .app-layout-focus .editor-format-toolbar { top: 12px; max-height: calc(100dvh - 24px); }
+  .app-layout-focus .article-rich-editor { height: clamp(360px, 68dvh, 820px); min-height: 360px; }
+}
+
+@media (max-width: 700px) {
+  .app-layout-focus .editor-page { width: calc(100% - 24px); padding-top: 8px; padding-bottom: 20px; }
+  .app-layout-focus .editor-flow-toolbar { min-height: 40px; margin-bottom: 8px; }
+  .app-layout-focus .editor-save-status { padding-block: 8px; }
+  .app-layout-focus .editor-card { padding: 10px 10px 12px; }
+  .app-layout-focus .article-rich-editor { height: 62dvh; min-height: 300px; }
+}
+
 @media (max-width: 420px) {
   .article-preview-actions { justify-content: stretch; }
   .article-preview-actions .ant-space-item { flex: 1 1 130px; }
@@ -804,8 +833,6 @@
   .local-session-card { padding: 28px 20px; }
 }
 
-.external-ai-support-sidebar { position: sticky; top: 0; align-self: flex-start; flex: 0 0 252px; width: 252px; height: 100vh; height: 100svh; overflow-y: auto; padding: 16px 12px; border-left: 1px solid var(--line); background: var(--surface); }
-.external-ai-support-inline { display: none; }
 .external-ai-support-card { max-width: 100%; border-color: var(--line); border-radius: 12px; background: var(--surface); transition: border-color .2s ease, box-shadow .22s ease; }
 .external-ai-tools-page { max-width: 840px; }
 .external-ai-tools-card { max-width: 640px; }
@@ -817,7 +844,6 @@
 .ai-brand-google { width: 18px; height: 20px; background: conic-gradient(from -45deg, #4285f4 0 25%, #34a853 25% 48%, #fbbc05 48% 70%, #ea4335 70% 84%, #4285f4 84%); background-clip: text; color: transparent; font: 700 18px/20px Arial, sans-serif; }
 .external-ai-support-heading-row .ai-brand-mark { margin-inline-end: 5px; }
 .external-ai-support-link .ant-btn-icon .ai-brand-mark { width: 16px; height: 16px; vertical-align: middle; }
-.external-ai-support-heading-actions { display: flex; flex: 0 0 auto; align-items: center; }
 .external-ai-support-card .ant-card-body { padding: 10px; }
 .external-ai-support-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .external-ai-support-link.ant-btn { min-width: 0; min-height: 36px; height: auto; padding-inline: 7px; white-space: normal; font-size: 0.8125rem; }

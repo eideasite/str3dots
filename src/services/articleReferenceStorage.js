@@ -3,7 +3,7 @@ const HOME_SHORTCUTS_KEY = 'jeyamohan-home-article-shortcuts-v1'
 
 function normalizeArticleIds(value) {
   if (!Array.isArray(value)) return []
-  return [...new Set(value.filter((id) => typeof id === 'string' && id.trim()))]
+  return [...new Set(value.filter((id) => typeof id === 'string').map((id) => id.trim()).filter(Boolean))]
 }
 
 function loadArticleIds(key) {
@@ -28,7 +28,7 @@ function saveArticleIds(key, articleIds) {
       }
       if (!Array.isArray(parsed)
         || parsed.some((id) => typeof id !== 'string' || !id.trim())
-        || new Set(parsed).size !== parsed.length) return false
+        || normalizeArticleIds(parsed).length !== parsed.length) return false
     }
     localStorage.setItem(key, JSON.stringify(normalizeArticleIds(articleIds)))
     return true

@@ -8,12 +8,17 @@ function createTestUrl(bytes) {
   return url.toString()
 }
 
+async function fetchSpeedTestSample(bytes, signal) {
+  const response = await fetch(createTestUrl(bytes), { signal, cache: 'no-store', credentials: 'omit', mode: 'cors' })
+  if (!response.ok) throw new Error(`Speed test source returned ${response.status}.`)
+  return response
+}
+
 async function measureLatency(signal) {
   const samples = []
   for (let index = 0; index < 3; index += 1) {
     const startedAt = performance.now()
-    const response = await fetch(createTestUrl(0), { signal, cache: 'no-store', credentials: 'omit', mode: 'cors' })
-    if (!response.ok) throw new Error(`Speed test source returned ${response.status}.`)
+    const response = await fetchSpeedTestSample(0, signal)
     await response.arrayBuffer()
     samples.push(performance.now() - startedAt)
   }
@@ -23,8 +28,7 @@ async function measureLatency(signal) {
 
 async function measureDownload(signal) {
   const startedAt = performance.now()
-  const response = await fetch(createTestUrl(DOWNLOAD_BYTES), { signal, cache: 'no-store', credentials: 'omit', mode: 'cors' })
-  if (!response.ok) throw new Error(`Speed test source returned ${response.status}.`)
+  const response = await fetchSpeedTestSample(DOWNLOAD_BYTES, signal)
 
   let bytesReceived = 0
   if (response.body?.getReader) {

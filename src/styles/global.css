@@ -43,6 +43,11 @@ button, input, textarea { font: inherit; }
 .mobile-brand { display: none; align-items: center; gap: 10px; font-size: 0.8125rem; }
 .mobile-brand .brand-mark { width: 32px; height: 32px; border-radius: 10px; }
 .app-content { min-width: 0; min-height: calc(100vh - 64px); }
+.app-layout-focus .app-sider,
+.app-layout-focus .app-header,
+.app-layout-focus .connectivity-status { display: none !important; }
+.app-layout-focus .app-main-layout { margin-left: 0; }
+.app-layout-focus .app-content { min-height: 100vh; min-height: 100svh; }
 .connectivity-status { min-width: 0; overflow-wrap: anywhere; }
 .connectivity-status .ant-alert-message,
 .connectivity-status .ant-alert-description { overflow-wrap: anywhere; }

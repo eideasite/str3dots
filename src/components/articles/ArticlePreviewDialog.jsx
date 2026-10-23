@@ -173,6 +173,11 @@ export default function ArticlePreviewDialog({ open, article, bookmarked = false
     }
   }
   const closePreview = () => { closeFind(); setReviewDialogOpen(false); onClose?.() }
+  const updateSelectedText = () => {
+    const selection = window.getSelection()
+    const isInsidePreview = selection && bodyRef.current?.contains(selection.anchorNode) && bodyRef.current.contains(selection.focusNode)
+    setSelectedText(isInsidePreview ? selection.toString() : '')
+  }
 
   return (
     <Modal
@@ -226,13 +231,7 @@ export default function ArticlePreviewDialog({ open, article, bookmarked = false
         </section>}
         <Typography.Title level={1}>{getArticleTitle(article)}</Typography.Title>
         {article.seoDescription && <Typography.Paragraph className="article-preview-description">{article.seoDescription}</Typography.Paragraph>}
-        <div ref={bodyRef} className="article-preview-body" onMouseUp={() => {
-          const selection = window.getSelection()
-          setSelectedText(selection && bodyRef.current?.contains(selection.anchorNode) && bodyRef.current.contains(selection.focusNode) ? selection.toString() : '')
-        }} onKeyUp={() => {
-          const selection = window.getSelection()
-          setSelectedText(selection && bodyRef.current?.contains(selection.anchorNode) && bodyRef.current.contains(selection.focusNode) ? selection.toString() : '')
-        }} dangerouslySetInnerHTML={{ __html: richTextToHtml(article.body || '') }} />
+        <div ref={bodyRef} className="article-preview-body" onMouseUp={updateSelectedText} onKeyUp={updateSelectedText} dangerouslySetInnerHTML={{ __html: richTextToHtml(article.body || '') }} />
         {onSaveToHighlights && <Typography.Paragraph type="secondary" className="article-preview-note">{highlights.length ? t(hasSelection ? 'Selected text will be saved.' : 'No text selected; the whole article will be saved.') : t('Create a Highlight Collection before saving.')}</Typography.Paragraph>}
         {onSaveReview && <section className="article-self-review" aria-labelledby="article-self-review-heading">
           <div className="article-self-review-heading">

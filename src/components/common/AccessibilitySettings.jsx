@@ -10,6 +10,15 @@ const DEFAULT_SETTINGS = { fontSize: 2, displaySize: 2, boldText: false, outline
 const SPEECH_STORAGE_KEY = 'jeyamohan-articles-speech-v1'
 const DEFAULT_SPEECH_SETTINGS = { voice: '', language: '', rate: 1, pitch: 1 }
 
+function isValidTime(value) {
+  if (typeof value !== 'string') return false
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+  if (!match) return false
+  const hours = Number(match[1])
+  const minutes = Number(match[2])
+  return hours < 24 && minutes < 60
+}
+
 function systemPrefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
 }
@@ -17,9 +26,16 @@ function systemPrefersReducedMotion() {
 function loadSpeechSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(SPEECH_STORAGE_KEY) || 'null')
-    return { ...DEFAULT_SPEECH_SETTINGS, ...(saved && typeof saved === 'object' ? saved : {}), rate: Number.isFinite(saved?.rate) ? Math.max(0.5, Math.min(2, saved.rate)) : 1, pitch: Number.isFinite(saved?.pitch) ? Math.max(0.5, Math.min(2, saved.pitch)) : 1 }
+    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return { ...DEFAULT_SPEECH_SETTINGS }
+    const clamp = (value) => Number.isFinite(value) ? Math.max(0.5, Math.min(2, value)) : 1
+    return {
+      voice: typeof saved.voice === 'string' ? saved.voice : '',
+      language: typeof saved.language === 'string' ? saved.language : '',
+      rate: clamp(saved.rate),
+      pitch: clamp(saved.pitch),
+    }
   } catch {
-    return DEFAULT_SPEECH_SETTINGS
+    return { ...DEFAULT_SPEECH_SETTINGS }
   }
 }
 
@@ -52,8 +68,8 @@ function loadSettings() {
       darkModeType: saved.darkModeType === 'expanded' ? 'expanded' : 'standard',
       pureBlack: saved.pureBlack === true,
       timing: saved.timing === 'schedule' ? 'schedule' : 'off',
-      startTime: typeof saved.startTime === 'string' && /^\d{2}:\d{2}$/.test(saved.startTime) ? saved.startTime : DEFAULT_SETTINGS.startTime,
-      endTime: typeof saved.endTime === 'string' && /^\d{2}:\d{2}$/.test(saved.endTime) ? saved.endTime : DEFAULT_SETTINGS.endTime,
+      startTime: isValidTime(saved.startTime) ? saved.startTime : DEFAULT_SETTINGS.startTime,
+      endTime: isValidTime(saved.endTime) ? saved.endTime : DEFAULT_SETTINGS.endTime,
     }
   } catch {
     return { ...DEFAULT_SETTINGS, reduceMotion: systemPrefersReducedMotion() }

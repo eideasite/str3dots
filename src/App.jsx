@@ -13,10 +13,10 @@ const BookmarksPage = lazy(() => import('./pages/BookmarksPage.jsx'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'))
 const PublishedPostPage = lazy(() => import('./pages/PublishedPostPage.jsx'))
-const PublishSuccessPage = lazy(() => import('./pages/PublishSuccessPage.jsx'))
-const SchedulePostPage = lazy(() => import('./pages/SchedulePostPage.jsx'))
+const PublishSuccessDialog = lazy(() => import('./components/publishing/PublishSuccessDialog.jsx'))
+const SchedulePostDialog = lazy(() => import('./components/publishing/SchedulePostDialog.jsx'))
 const SEOSettingsPage = lazy(() => import('./pages/SEOSettingsPage.jsx'))
-const ShareArticlePage = lazy(() => import('./pages/ShareArticlePage.jsx'))
+const ShareArticleDialog = lazy(() => import('./components/publishing/ShareArticleDialog.jsx'))
 const DiscardDraftDialog = lazy(() => import('./components/articles/DiscardDraftDialog.jsx'))
 const ArticlePreviewDialog = lazy(() => import('./components/articles/ArticlePreviewDialog.jsx'))
 import MainLayout from './layouts/MainLayout.jsx'
@@ -95,6 +95,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
   const { saveStatus, setSaveStatus, saveNow } = useDraft(workspace)
   const { updateWorkspace, updateArticle: updateArticleById, createNewArticle: addArticle } = useArticles(setWorkspace, () => setSaveStatus('saving'))
   const [page, setPage] = useState(initialRoute.page)
+  const [focusMode, setFocusMode] = useState(false)
   const [editorReturnPage, setEditorReturnPage] = useState('compose')
   const [activeArticleId, setActiveArticleId] = useState(() => workspace.articles.some((article) => article.id === initialRoute.articleId)
     ? initialRoute.articleId
@@ -153,6 +154,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
         ? event.state.jeyamohanArticleId
         : new URLSearchParams(hashQuery).get('article')
       setPage(nextValidPage)
+      if (nextValidPage !== 'editor') setFocusMode(false)
       if (routeArticleId && workspace.articles.some((article) => article.id === routeArticleId)) setActiveArticleId(routeArticleId)
       else if (ARTICLE_CONTEXT_PAGES.has(nextValidPage)) setActiveArticleId(workspace.articles[0]?.id || null)
     }
@@ -162,6 +164,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
 
   const navigateTo = (destination, { replace = false, articleId = activeArticleId } = {}) => {
     if (!APP_PAGES.has(destination)) return
+    if (destination !== 'editor') setFocusMode(false)
     const currentDepth = Number.isInteger(window.history.state?.jeyamohanDepth) ? window.history.state.jeyamohanDepth : 0
     const nextArticleId = workspace.articles.some((article) => article.id === articleId) ? articleId : null
     const nextState = { ...window.history.state, jeyamohanPage: destination, jeyamohanDepth: replace ? currentDepth : currentDepth + 1, jeyamohanArticleId: nextArticleId }
@@ -527,7 +530,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
   } else if (page === 'profile') {
     pageContent = <ProfilePage profile={workspace.profile} onChange={(profile) => updateWorkspace((current) => ({ ...current, profile }))} onContinue={continueFromProfile} />
   } else if (page === 'editor') {
-    pageContent = <ArticleEditorPage article={activeArticle} saveStatus={saveStatus} onSaveDraft={saveNow} onChange={(patch) => updateArticle(patch)} onOpenSeo={() => openSeo('editor')} onManage={() => navigateTo('articles')} onCreate={() => createArticle()} onBackHome={() => goBack(editorReturnPage)} onDiscard={() => setDiscardOpen(true)} onPreview={() => setPreviewOpen(true)} onDownloadPdf={() => setPrintingArticle(activeArticle)} />
+    pageContent = <ArticleEditorPage article={activeArticle} saveStatus={saveStatus} focusMode={focusMode} onToggleFocus={() => setFocusMode((value) => !value)} onSaveDraft={saveNow} onChange={(patch) => updateArticle(patch)} onOpenSeo={() => openSeo('editor')} onManage={() => navigateTo('articles')} onCreate={() => createArticle()} onBackHome={() => goBack(editorReturnPage)} onDiscard={() => setDiscardOpen(true)} onPreview={() => setPreviewOpen(true)} onDownloadPdf={() => setPrintingArticle(activeArticle)} />
   } else if (page === 'seo') {
     pageContent = <SEOSettingsPage article={activeArticle} onChange={(patch) => updateArticle(patch)} onBack={() => goBack(seoReturnPage)} onContinue={() => openShare()} />
   } else if (page === 'published') {
@@ -546,7 +549,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
 
   return (
     <>
-      <MainLayout page={page} onNavigate={navigate} saveStatus={saveStatus} workspaceRecoveryState={workspaceRecoveryState} onDownloadRecoveryCopy={downloadWorkspaceRecoveryCopy} themeMode={themeMode} onThemeChange={onThemeChange} language={language} onLanguageChange={onLanguageChange} profile={workspace.profile} onLock={() => changeSessionStatus('locked')} onSignOut={() => changeSessionStatus('signed-out')}>
+      <MainLayout page={page} focusMode={page === 'editor' && focusMode} onNavigate={navigate} saveStatus={saveStatus} workspaceRecoveryState={workspaceRecoveryState} onDownloadRecoveryCopy={downloadWorkspaceRecoveryCopy} themeMode={themeMode} onThemeChange={onThemeChange} language={language} onLanguageChange={onLanguageChange} profile={workspace.profile} onLock={() => changeSessionStatus('locked')} onSignOut={() => changeSessionStatus('signed-out')}>
         <Suspense fallback={<div className="screen-loading" role="status">{t('Loading…')}</div>}>
           {pageContent}
         </Suspense>
@@ -574,9 +577,9 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
           {workspace.articles.filter((article) => article.pinned === true).map((article) => <Radio className="pin-replacement-option" key={article.id} value={article.id}>{getArticleTitle(article)}</Radio>)}
         </Radio.Group>
       </Modal>
-      {shareOpen && <Suspense fallback={null}><ShareArticlePage open article={activeArticle} loading={posting} onClose={() => !posting && setShareOpen(false)} onPublishLocal={publishArticleLocally} onSchedule={scheduleFromShare} onDownloadPdf={() => setPrintingArticle(activeArticle)} /></Suspense>}
-      {scheduleOpen && <Suspense fallback={null}><SchedulePostPage open article={activeArticle} loading={posting} onClose={() => !posting && setScheduleOpen(false)} onSchedule={scheduleArticleLocally} /></Suspense>}
-      {successOpen && <Suspense fallback={null}><PublishSuccessPage open article={activeArticle} onClose={() => setSuccessOpen(false)} onView={() => { setSuccessOpen(false); navigateTo('published') }} /></Suspense>}
+      {shareOpen && <Suspense fallback={null}><ShareArticleDialog open article={activeArticle} loading={posting} onClose={() => !posting && setShareOpen(false)} onPublishLocal={publishArticleLocally} onSchedule={scheduleFromShare} onDownloadPdf={() => setPrintingArticle(activeArticle)} /></Suspense>}
+      {scheduleOpen && <Suspense fallback={null}><SchedulePostDialog open article={activeArticle} loading={posting} onClose={() => !posting && setScheduleOpen(false)} onSchedule={scheduleArticleLocally} /></Suspense>}
+      {successOpen && <Suspense fallback={null}><PublishSuccessDialog open article={activeArticle} onClose={() => setSuccessOpen(false)} onView={() => { setSuccessOpen(false); navigateTo('published') }} /></Suspense>}
       {discardOpen && <Suspense fallback={null}><DiscardDraftDialog open article={activeArticle} onCancel={() => setDiscardOpen(false)} onConfirm={confirmDiscard} /></Suspense>}
     </>
   )

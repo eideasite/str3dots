@@ -1,6 +1,6 @@
 import { Space, Spin, Typography } from 'antd'
 
-export default function LoadingState({ message = 'சேமிக்கிறது…' }) {
+export default function LoadingState({ message }) {
   return <Space size={7}><Spin size="small" /><Typography.Text type="secondary">{message}</Typography.Text></Space>
 }
 

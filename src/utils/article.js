@@ -1,51 +1,62 @@
-let fallbackIdCounter = 0
+import { createId } from './createId.js'
 
-function createId() {
-  if (typeof globalThis.crypto?.randomUUID === 'function') return globalThis.crypto.randomUUID()
-  fallbackIdCounter += 1
-  const randomPart = Math.random().toString(36).slice(2, 10)
-  return `article-${Date.now().toString(36)}-${fallbackIdCounter.toString(36)}-${randomPart}`
+export const createArticle = (overrides = {}) => {
+  const timestamp = new Date().toISOString()
+  return {
+    id: createId('article'),
+    title: '',
+    body: '',
+    seoTitle: '',
+    seoDescription: '',
+    slug: '',
+    status: 'draft',
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    scheduledAt: null,
+    publishedAt: null,
+    ...overrides,
+  }
 }
-
-export const createArticle = (overrides = {}) => ({
-  id: createId(),
-  title: '',
-  body: '',
-  seoTitle: '',
-  seoDescription: '',
-  slug: '',
-  status: 'draft',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  scheduledAt: null,
-  publishedAt: null,
-  ...overrides,
-})
 
 import { richTextToPlainText } from './richText.js'
 
+const wordSegmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'word' }) : null
+const graphemeSegmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null
+
 export const getArticleTitle = (article) => (typeof article?.title === 'string' ? article.title.trim() : '') || 'தலைப்பில்லாத கட்டுரை'
 
-export const getWordCount = (body = '') => {
-  const text = richTextToPlainText(body)
-  if (!text) return 0
-  if (typeof Intl.Segmenter === 'function') {
-    return Array.from(new Intl.Segmenter(undefined, { granularity: 'word' }).segment(text))
+export const getWordCountFromText = (text = '') => {
+  const normalizedText = typeof text === 'string' ? text.trim() : ''
+  if (!normalizedText) return 0
+  if (wordSegmenter) {
+    return Array.from(wordSegmenter.segment(normalizedText))
       .filter((segment) => segment.isWordLike).length
   }
-  return text.split(/\s+/u).length
+  return normalizedText.split(/\s+/u).length
 }
 
-export const getReadingMinutes = (body = '') => Math.max(1, Math.ceil(getWordCount(body) / 200))
+export const getReadingMinutesFromWordCount = (wordCount) => (
+  Number.isFinite(wordCount) && wordCount > 0 ? Math.ceil(wordCount / 200) : 1
+)
+
+export function getArticleReadingMetrics(body = '') {
+  const words = getWordCountFromText(richTextToPlainText(body))
+  return { words, readingMinutes: getReadingMinutesFromWordCount(words) }
+}
+
+export const getWordCount = (body = '') => getArticleReadingMetrics(body).words
+export const getReadingMinutes = (body = '') => getArticleReadingMetrics(body).readingMinutes
 
 export const getArticleExcerpt = (body = '', limit = 170) => {
   const text = richTextToPlainText(body).replace(/\s+/gu, ' ').trim()
-  const graphemes = typeof Intl.Segmenter === 'function'
-    ? Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text), (segment) => segment.segment)
+  const graphemes = graphemeSegmenter
+    ? Array.from(graphemeSegmenter.segment(text), (segment) => segment.segment)
     : Array.from(text)
   return graphemes.length > limit ? `${graphemes.slice(0, limit).join('').trimEnd()}…` : text
 }
 
-export const makeSafeFilename = (title = '') =>
-  (title.trim() || 'என்-கட்டுரை').replace(/[\\/:*?"<>|]/gu, '-').slice(0, 80)
+export const makeSafeFilename = (title = '') => {
+  const normalizedTitle = typeof title === 'string' ? title.trim() : ''
+  return (normalizedTitle || 'என்-கட்டுரை').replace(/[\\/:*?"<>|]/gu, '-').slice(0, 80)
+}
 

@@ -25,3 +25,10 @@ npm run lint
 - Article text can be copied or downloaded as a `.txt` file.
 
 There is no backend or configured external publishing, scheduling, or analytics integration.
+
+## Latest update (2026-10-23)
+
+- Refined the responsive writing workspace and compact article controls.
+- Improved accessibility settings, date and article metrics handling, and local storage recovery.
+- Hardened image imports and rich-text handling, including pending-read cleanup and safer editor updates.
+- Verified with `npm run lint` and `npm run build`.

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Alert, Button, DatePicker, Modal, Space, Spin, Typography, message } from 'antd'
 import { CalendarOutlined } from '@ant-design/icons'
 import { getArticleTitle } from '../../utils/article.js'
+import { formatDate, getDateLocale } from '../../utils/formatDate.js'
 import { useLanguage } from '../../context/LanguageContext.jsx'
 
 const { Paragraph, Text } = Typography
@@ -30,7 +31,7 @@ export default function SchedulePostDialog({ open, article, onClose, onSchedule,
         <Button onClick={close} disabled={loading}>{t('Cancel')}</Button>
         <Button type="primary" icon={<CalendarOutlined />} loading={loading} disabled={loading} onClick={submit}>{t('Schedule locally')}</Button>
       </Space>
-      {article?.scheduledAt && <Text type="secondary">{t('Previous schedule')}: {new Date(article.scheduledAt).toLocaleString(language === 'ta' ? 'ta-LK' : 'en-US')}</Text>}
+      {article?.scheduledAt && <Text type="secondary">{t('Previous schedule')}: {formatDate(article.scheduledAt, { dateStyle: 'short', timeStyle: 'short' }, getDateLocale(language))}</Text>}
       </Spin>
     </Modal>
   )

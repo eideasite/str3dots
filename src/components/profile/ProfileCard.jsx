@@ -14,8 +14,8 @@ export default function ProfileCard({ profile, onChange, onContinue }) {
         <ProfileAvatar profile={profile} size={72} className="profile-avatar" />
         <div><Title level={4}>{profile.name || t('Writer')}</Title><Text type="secondary">{t('Article writer')}</Text></div>
       </div>
-      <label className="field-label">{t('Choose an avatar')}</label>
-      <div className="profile-avatar-picker" role="group" aria-label={t('Choose an avatar')}>
+      <div className="field-label" id="profile-avatar-label">{t('Choose an avatar')}</div>
+      <div className="profile-avatar-picker" role="group" aria-labelledby="profile-avatar-label">
         {PROFILE_AVATARS.map((avatar) => <button key={avatar} type="button" className={`profile-avatar-choice ${profile.avatar === avatar ? 'is-selected' : ''}`} aria-label={`${t('Choose avatar')} ${avatar}`} aria-pressed={profile.avatar === avatar} onClick={() => onChange({ ...profile, avatar })}>{avatar}</button>)}
       </div>
       <label className="field-label" htmlFor="profile-name">{t('Name shown to readers')}</label>
