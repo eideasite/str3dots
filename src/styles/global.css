@@ -99,13 +99,17 @@ button, input, textarea { font: inherit; }
 }
 
 @media (max-width: 700px) {
-  .app-header { padding-inline: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .app-header { row-gap: 6px; padding-inline: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .google-ai-search { order: 1; height: 42px; }
+  .google-ai-search .google-ai-search-input.ant-input { height: 36px; padding-inline: 12px; }
+  .google-ai-search .google-ai-search-submit.ant-btn { height: 38px; padding-inline: 14px; }
+  .mobile-brand { order: 2; }
+  .header-tools { order: 3; }
   .mobile-brand { flex: 1 1 100%; }
-  .header-tools { display: grid; grid-template-columns: 36px minmax(92px, 1fr) 48px 56px; flex: 1 1 100%; min-width: 0; align-items: center; justify-content: stretch; gap: 8px; margin-left: 0; }
+  .header-tools { display: grid; grid-template-columns: 36px minmax(0, 1fr) 48px 48px; flex: 1 1 100%; min-width: 0; align-items: center; justify-content: stretch; gap: 8px; margin-left: 0; }
   .header-tools .language-select { width: 100%; min-width: 0; }
-  .header-tools .theme-mode-switch { justify-self: center; }
-  .header-tools .account-menu-trigger { display: inline-flex; min-width: 0; justify-content: center; padding-inline: 3px; }
-  .google-ai-search { flex: 1 1 100%; }
+  .header-tools .theme-mode-switch { width: 44px; min-width: 44px; justify-self: center; }
+  .header-tools .account-menu-trigger { display: inline-flex; width: 48px; min-width: 48px; justify-self: end; justify-content: center; padding-inline: 3px; }
   .page-wrap, .narrow-page { width: calc(100% - 32px); padding-top: 26px; padding-bottom: 44px; }
   .page-heading-row { align-items: flex-start; flex-direction: column; gap: 12px; }
   .page-heading-row > :first-child { width: 100%; min-width: 0; }
@@ -118,9 +122,9 @@ button, input, textarea { font: inherit; }
 
 @media (max-width: 420px) {
   .page-wrap, .narrow-page { width: calc(100% - 24px); padding-top: 20px; padding-bottom: 32px; }
-  .app-header { gap: 7px; padding-top: max(8px, env(safe-area-inset-top)); }
+  .app-header { row-gap: 5px; padding-top: max(8px, env(safe-area-inset-top)); }
   .header-note { display: none; }
-  .header-tools { gap: 7px; }
+  .header-tools { gap: 6px; }
   .header-tools .ant-select, .language-select { width: 100%; min-width: 0; flex: 0 1 auto; }
   .mobile-brand { min-width: 0; gap: 5px; }
   .mobile-brand .ant-btn { padding-inline: 6px; }
