@@ -107,7 +107,7 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
               <div className="network-estimate-compact-copy">
                 <Typography.Text strong>{t('Network status')}</Typography.Text>
                 <Typography.Text type="secondary">{networkStatusSummary}</Typography.Text>
-                <Popover content={networkInfoContent} title={t('Network details')} trigger="click" placement="bottomLeft" overlayClassName="network-estimate-popover">
+                <Popover content={networkInfoContent} title={t('Network details')} trigger="click" placement="bottom" overlayClassName="network-estimate-popover">
                   <Button className="network-estimate-info-button" type="text" icon={<InfoCircleOutlined />} aria-label={t('Network details')} />
                 </Popover>
               </div>

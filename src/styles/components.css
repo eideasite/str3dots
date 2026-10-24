@@ -12,7 +12,8 @@
 .network-estimate-info-button.ant-btn:hover { color: var(--ink); }
 .network-estimate-info { display: grid; max-width: 340px; gap: 9px; }
 .network-estimate-info > .ant-typography { margin: 0; font-size: 0.75rem; line-height: 1.5; }
-.network-estimate-popover .ant-popover-inner { max-width: min(360px, calc(100vw - 32px)); }
+.network-estimate-popover { max-width: calc(100vw - 24px); }
+.network-estimate-popover .ant-popover-inner { width: min(340px, calc(100vw - 24px)); max-width: calc(100vw - 24px); }
 .network-estimate-compact .connectivity-check-button.ant-btn { min-height: 32px; height: 32px; padding-inline: 11px; }
 .connectivity-offline .ant-alert-message, .network-estimate-status .ant-alert-message { color: var(--ink); font-weight: 650; }
 .connectivity-offline .ant-alert-description, .network-estimate-status .ant-alert-description { color: var(--muted); line-height: 1.6; }
@@ -682,7 +683,10 @@
   .connectivity-offline.ant-alert-banner, .network-estimate-status.ant-alert-banner { width: calc(100% - 32px); padding: 12px 14px; }
   .network-estimate-status.network-estimate-compact.ant-alert-banner { padding: 7px 10px; }
   .network-estimate-compact-row { gap: 6px; }
-  .network-estimate-compact-copy { gap: 4px 7px; }
+  .network-estimate-compact-copy { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: 2px 4px; }
+  .network-estimate-compact-copy > .ant-typography:first-child { grid-column: 1 / -1; }
+  .network-estimate-compact-copy > .ant-typography-secondary { min-width: 0; }
+  .network-estimate-compact-copy .network-estimate-info-button { grid-column: 2; grid-row: 2; }
   .network-estimate-compact .connectivity-check-button.ant-btn { min-height: 30px; height: 30px; padding-inline: 8px; font-size: 0.75rem; }
   .surface-card { border-radius: var(--ui-radius-card) !important; }
   .editor-page-heading { align-items: flex-start; flex-direction: column; }
@@ -799,6 +803,7 @@
 
 @media (hover: none) and (pointer: coarse) {
   .ant-btn, .ant-select-selector, .ant-switch, .article-row-main, .quick-composer-option { min-height: 42px; }
+  .app-header .theme-mode-switch.ant-switch { min-height: 24px; height: 24px; }
 }
 /* Compact, consistent error notifications for app and browser-level failures. */
 .system-error-notification .ant-notification-notice {
