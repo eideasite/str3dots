@@ -132,22 +132,57 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
     () => posts.slice().sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt)),
     [posts],
   )
-  const visiblePosts = showAllPosts ? recentPosts : recentPosts.slice(0, 3)
+  const numberedRecentPosts = useMemo(() => {
+    const dailyPostNumbers = new Map()
+
+    return recentPosts.slice().reverse().map((post) => {
+      const createdAt = new Date(post.createdAt)
+      const dayKey = Number.isNaN(createdAt.getTime())
+        ? `invalid-${post.id}`
+        : `${createdAt.getFullYear()}-${createdAt.getMonth()}-${createdAt.getDate()}`
+      const postNumber = (dailyPostNumbers.get(dayKey) || 0) + 1
+      dailyPostNumbers.set(dayKey, postNumber)
+
+      return { post, postNumber }
+    }).reverse()
+  }, [recentPosts])
+  const visiblePosts = showAllPosts ? numberedRecentPosts : numberedRecentPosts.slice(0, 3)
   const activeArticles = useMemo(() => articles.filter((article) => !article.archived), [articles])
+  const articleSampleNumbers = useMemo(() => {
+    const numbers = new Map()
+    activeArticles.forEach((article) => {
+      if (!(typeof article.title === 'string' && article.title.trim())) {
+        numbers.set(article.id, numbers.size + 1)
+      }
+    })
+    return numbers
+  }, [activeArticles])
   const articlesById = useMemo(() => new Map(articles.map((article) => [article.id, article])), [articles])
+  const articleListProps = {
+    filter: 'all',
+    articleSampleNumbers,
+    onOpen: onOpenArticle,
+    onAction: onArticleAction,
+    bookmarkedIds,
+    shortcutIds,
+    pinnedIds,
+    onToggleBookmark,
+    onToggleShortcut,
+    onTogglePin,
+  }
   const shortcutArticles = useMemo(
     () => shortcutIds.map((id) => articlesById.get(id)).filter((article) => article && !article.archived),
     [articlesById, shortcutIds],
   )
   const missingShortcutCount = useMemo(
-    () => shortcutIds.filter((id) => !articlesById.has(id)).length,
+    () => shortcutIds.filter((id) => !articlesById.has(id) || articlesById.get(id).archived).length,
     [articlesById, shortcutIds],
   )
 
   return (
     <main className="quick-composer-page">
       <div className="quick-composer-layout">
-      <div className="quick-composer-primary-column">
+      <div className="quick-composer-main-column">
       <div className="quick-composer-panel">
         <div className="quick-composer">
           <ProfileAvatar profile={profile} className="quick-composer-avatar" />
@@ -179,22 +214,38 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
 
       <section className="home-article-section quick-composer-recent" aria-labelledby="home-recent-posts-heading">
         <div className="home-article-section-heading">
-          <Typography.Title level={4} id="home-recent-posts-heading">{t('Recent Posts')}</Typography.Title>
+          <div className="home-post-heading-title">
+            <Typography.Title level={4} id="home-recent-posts-heading">{t('Recent Posts')}</Typography.Title>
+            <span
+              className="home-post-total-count"
+              aria-label={t('Total posts: {count}').replace('{count}', String(recentPosts.length))}
+              title={t('Total posts: {count}').replace('{count}', String(recentPosts.length))}
+            >
+              {recentPosts.length}
+            </span>
+          </div>
           {recentPosts.length > 3 && <Button type="link" onClick={() => setShowAllPosts((current) => !current)}>{t(showAllPosts ? 'Show Less' : 'See More')}</Button>}
         </div>
         {visiblePosts.length === 0 ? <Empty className="list-empty" description={t('No posts yet')} /> : (
           <div className="home-post-feed">
-            {visiblePosts.map((post) => (
+            {visiblePosts.map(({ post, postNumber }) => (
               <Card className="home-post-card" key={post.id}>
                 <div className="home-post-author">
-                  <ProfileAvatar profile={profile} className="quick-composer-avatar" />
+                  <ProfileAvatar profile={profile} size={40} className="quick-composer-avatar home-post-avatar" />
                   <div className="home-post-author-info">
-                    <Typography.Text strong>{profile.name || t('Writer')}</Typography.Text>
-                    <Typography.Text type="secondary">{formatDate(post.createdAt, { dateStyle: 'medium', timeStyle: 'short' }, getDateLocale(language))} · {t('Local post')}</Typography.Text>
+                    <Typography.Text className="home-post-author-name" strong>{profile.name || t('Writer')}</Typography.Text>
+                    <div className="home-post-meta">
+                      <Typography.Text type="secondary">{formatDate(post.createdAt, { dateStyle: 'medium', timeStyle: 'short' }, getDateLocale(language))} · {t('Local post')}</Typography.Text>
+                      <span className="home-post-number-chip" aria-label={`Post number ${postNumber}`} title={`Post ${postNumber} for this day`}>#{postNumber}</span>
+                    </div>
                   </div>
                 </div>
-                {post.text && <div className="home-post-body">{post.text}</div>}
-                {post.image?.src && <img className="home-post-image" src={post.image.src} alt={post.image.name || t('Post image')} />}
+                {(post.text || post.image?.src) && (
+                  <div className="home-post-content">
+                    {post.text && <div className="home-post-body">{post.text}</div>}
+                    {post.image?.src && <img className="home-post-image" src={post.image.src} alt={post.image.name || t('Post image')} />}
+                  </div>
+                )}
               </Card>
             ))}
           </div>
@@ -204,12 +255,35 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
         <div className="home-article-section-heading">
           <Typography.Title level={4} id="home-articles-heading">{t('Articles')}</Typography.Title>
         </div>
-        <ArticleList articles={activeArticles} filter="all" onOpen={onOpenArticle} onAction={onArticleAction} bookmarkedIds={bookmarkedIds} shortcutIds={shortcutIds} pinnedIds={pinnedIds} onToggleBookmark={onToggleBookmark} onToggleShortcut={onToggleShortcut} onTogglePin={onTogglePin} compact />
+        {activeArticles.length > 4 ? (
+          <>
+            <ArticleList
+              {...articleListProps}
+              articles={activeArticles.slice(0, 4)}
+              articleSampleNumbers={articleSampleNumbers}
+              compact
+            />
+            <ArticleList
+              {...articleListProps}
+              articles={activeArticles.slice(4)}
+              articleSampleNumbers={articleSampleNumbers}
+            />
+          </>
+        ) : (
+          <ArticleList
+            {...articleListProps}
+            articles={activeArticles}
+            articleSampleNumbers={articleSampleNumbers}
+            compact
+          />
+        )}
       </section>
       </div>
-      <div className="quick-composer-secondary-column">
+      <div className="quick-composer-left-column">
       <div className="quick-composer-highlights"><HighlightsSection profile={profile} highlights={highlights} onSave={onSaveHighlights} /></div>
+      </div>
 
+      <div className="quick-composer-right-column">
       <section className="home-article-section quick-composer-shortcuts" aria-labelledby="home-shortcuts-heading">
         <div className="home-article-section-heading">
           <Typography.Title level={4} id="home-shortcuts-heading">{t('Home Shortcuts')}</Typography.Title>
@@ -228,8 +302,8 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
           emptyDescription={t(shortcutIds.length ? 'Saved shortcuts are unavailable.' : 'No Home Shortcuts yet')}
         />
       </section>
-
       </div>
+
       </div>
 
       <Modal

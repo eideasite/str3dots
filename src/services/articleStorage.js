@@ -83,6 +83,8 @@ function normalizeArticle(value) {
     seoTitle: typeof value.seoTitle === 'string' ? value.seoTitle : '',
     seoDescription: typeof value.seoDescription === 'string' ? value.seoDescription : '',
     slug: typeof value.slug === 'string' ? value.slug : '',
+    archived: value.archived === true,
+    archivedAt: value.archived === true ? dateOrDefault(value.archivedAt, null) : null,
   })
   if (typeof article.id !== 'string' || !article.id.trim()) article.id = createArticle().id
   if (!['draft', 'scheduled', 'published'].includes(article.status)) article.status = 'draft'

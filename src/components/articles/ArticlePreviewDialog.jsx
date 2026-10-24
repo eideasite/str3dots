@@ -172,7 +172,12 @@ export default function ArticlePreviewDialog({ open, article, bookmarked = false
       setReviewSaving(false)
     }
   }
-  const closePreview = () => { closeFind(); setReviewDialogOpen(false); onClose?.() }
+  const closePreview = () => {
+    closeFind()
+    setSelectedText('')
+    setReviewDialogOpen(false)
+    onClose?.()
+  }
   const updateSelectedText = () => {
     const selection = window.getSelection()
     const isInsidePreview = selection && bodyRef.current?.contains(selection.anchorNode) && bodyRef.current.contains(selection.focusNode)

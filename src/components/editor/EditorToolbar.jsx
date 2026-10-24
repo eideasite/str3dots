@@ -42,6 +42,9 @@ const formatActions = [
   { key: 'image', label: 'Insert image reference', icon: <PictureOutlined /> },
 ]
 
+const toggleFormatKeys = new Set(['bold', 'italic', 'underline', 'bullet', 'number', 'quote', 'codeblock'])
+const referenceFormatKeys = new Set(['link', 'image'])
+
 export function EditorFormatToolbar({ onFormat, activeFormats = {} }) {
   const { t } = useLanguage()
   const [activePopover, setActivePopover] = useState(null)
@@ -73,27 +76,56 @@ export function EditorFormatToolbar({ onFormat, activeFormats = {} }) {
         </Tooltip>
       </div>
       {formatActions.map(({ key, label, icon }) => {
-        const isToggle = ['bold', 'italic', 'underline', 'bullet', 'number', 'quote', 'codeblock'].includes(key)
+        const isToggle = toggleFormatKeys.has(key)
         const isActive = isToggle && activeFormats[key] === true
         const action = (
-          <Button className={`format-icon-button${isActive ? ' is-active' : ''}`} aria-label={t(label)} aria-pressed={isToggle ? isActive : undefined} onMouseDown={(event) => event.preventDefault()} onClick={() => {
-            if (key === 'link' || key === 'image') { setUrl(''); setActivePopover(key) }
-            else onFormat(key)
-          }}>
+          <Button
+            className={`format-icon-button${isActive ? ' is-active' : ''}`}
+            aria-label={t(label)}
+            aria-pressed={isToggle ? isActive : undefined}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => {
+              if (referenceFormatKeys.has(key)) {
+                setUrl('')
+                setActivePopover(key)
+                return
+              }
+
+              onFormat(key)
+            }}
+          >
             {icon}
           </Button>
         )
-        if (key === 'link' || key === 'image') {
+        if (referenceFormatKeys.has(key)) {
+          const referenceLabel = key === 'link' ? 'Insert link' : 'Insert image'
+          const inputPlaceholder = key === 'link' ? 'https://...' : t('Image URL')
+
           return (
             <Popover
               key={key}
-              title={t(key === 'link' ? 'Insert link' : 'Insert image')}
+              title={t(referenceLabel)}
               open={activePopover === key}
               onOpenChange={(open) => setActivePopover(open ? key : null)}
-              content={<Space direction="vertical" size="small" className="reference-popover">
-                <Input autoFocus placeholder={key === 'link' ? 'https://...' : t('Image URL')} value={url} onChange={(event) => setUrl(event.target.value)} onPressEnter={() => insertReference(key)} />
-                <Button type="primary" block onMouseDown={(event) => event.preventDefault()} onClick={() => insertReference(key)}>{t('Insert')}</Button>
-              </Space>}
+              content={(
+                <Space direction="vertical" size="small" className="reference-popover">
+                  <Input
+                    autoFocus
+                    placeholder={inputPlaceholder}
+                    value={url}
+                    onChange={(event) => setUrl(event.target.value)}
+                    onPressEnter={() => insertReference(key)}
+                  />
+                  <Button
+                    type="primary"
+                    block
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => insertReference(key)}
+                  >
+                    {t('Insert')}
+                  </Button>
+                </Space>
+              )}
               trigger="click"
               placement="right"
             >

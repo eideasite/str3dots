@@ -12,6 +12,20 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 
 const { Text } = Typography
 
+const FORMAT_COMMANDS = {
+  bold: ['bold'],
+  italic: ['italic'],
+  underline: ['underline'],
+  bullet: ['insertUnorderedList'],
+  number: ['insertOrderedList'],
+  quote: ['formatBlock', 'blockquote'],
+  codeblock: ['formatBlock', 'pre'],
+  rule: ['insertHorizontalRule'],
+  heading1: ['formatBlock', 'h1'],
+  heading2: ['formatBlock', 'h2'],
+  paragraph: ['formatBlock', 'p'],
+}
+
 export default function ArticleEditorPage({ article, saveStatus, focusMode = false, onToggleFocus, onSaveDraft, onChange, onOpenSeo, onManage, onCreate, onDiscard, onBackHome, onPreview, onDownloadPdf }) {
   const { t, language } = useLanguage()
   const bodyRef = useRef(null)
@@ -146,26 +160,47 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
         document.execCommand('insertHTML', false, `<img src="${escapeHtml(value)}" alt="" loading="lazy">`)
       }
     } else {
-      const commands = {
-        bold: ['bold'], italic: ['italic'], underline: ['underline'], bullet: ['insertUnorderedList'],
-        number: ['insertOrderedList'], quote: ['formatBlock', 'blockquote'],
-        codeblock: ['formatBlock', 'pre'], rule: ['insertHorizontalRule'],
-        heading1: ['formatBlock', 'h1'], heading2: ['formatBlock', 'h2'], paragraph: ['formatBlock', 'p'],
-      }
-      const command = commands[format]
+      const command = FORMAT_COMMANDS[format]
       if (command) document.execCommand(command[0], false, command[1])
     }
     commitEditor()
   }
 
-  if (!article) return <div className="page-wrap editor-page"><Card className="surface-card"><Typography.Title level={3}>{t('No article is open')}</Typography.Title><Typography.Paragraph>{t('Open a draft from Articles Management or create a new article.')}</Typography.Paragraph><div className="form-actions"><Button type="primary" onClick={onCreate}>{t('Create new article')}</Button><Button onClick={onManage}>{t('View articles')}</Button></div></Card></div>
+  if (!article) {
+    return (
+      <div className="page-wrap editor-page">
+        <Card className="surface-card">
+          <Typography.Title level={3}>{t('No article is open')}</Typography.Title>
+          <Typography.Paragraph>
+            {t('Open a draft from Articles Management or create a new article.')}
+          </Typography.Paragraph>
+          <div className="form-actions">
+            <Button type="primary" onClick={onCreate}>{t('Create new article')}</Button>
+            <Button onClick={onManage}>{t('View articles')}</Button>
+          </div>
+        </Card>
+      </div>
+    )
+  }
 
   const plainBody = richTextToPlainText(deferredBody)
   const words = getWordCountFromText(plainBody)
   const readingMinutes = getReadingMinutesFromWordCount(words)
   return (
     <div className="page-wrap editor-page">
-      <EditorToolbar article={article} focusMode={focusMode} onToggleFocus={onToggleFocus} onOpenSeo={onOpenSeo} onManage={onManage} onDiscard={onDiscard} onBackHome={onBackHome} onSaveDraft={onSaveDraft} onPreview={onPreview} onDownloadPdf={onDownloadPdf} onAskGemini={() => setGeminiOpen(true)} />
+      <EditorToolbar
+        article={article}
+        focusMode={focusMode}
+        onToggleFocus={onToggleFocus}
+        onOpenSeo={onOpenSeo}
+        onManage={onManage}
+        onDiscard={onDiscard}
+        onBackHome={onBackHome}
+        onSaveDraft={onSaveDraft}
+        onPreview={onPreview}
+        onDownloadPdf={onDownloadPdf}
+        onAskGemini={() => setGeminiOpen(true)}
+      />
       <Alert
         className="local-notice editor-save-status"
         showIcon

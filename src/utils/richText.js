@@ -10,6 +10,7 @@ const SANITIZE_OPTIONS = {
   RETURN_TRUSTED_TYPE: false,
 }
 const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+const MAX_INLINE_IMAGE_URL_LENGTH = 5_600_000
 
 export function isRichTextHtml(value = '') {
   return typeof value === 'string'
@@ -26,7 +27,8 @@ function isSafeUrl(value, image = false) {
     const code = character.charCodeAt(0)
     return code <= 31 || code === 127
   })) return false
-  if (image && /^data:image\/(?:png|jpeg|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(candidate) && candidate.length <= 1500000) return true
+  if (image && /^data:image\/(?:png|jpeg|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(candidate)
+    && candidate.length <= MAX_INLINE_IMAGE_URL_LENGTH) return true
   try {
     const url = new URL(candidate, window.location.origin)
     if (url.username || url.password) return false

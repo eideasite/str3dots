@@ -8,10 +8,20 @@ const graphemeSegmenter = typeof Intl.Segmenter === 'function'
 function getInitial(name) {
   const value = typeof name === 'string' ? name.trim() : ''
   if (!value) return DEFAULT_INITIAL
-  if (graphemeSegmenter) return graphemeSegmenter.segment(value)[Symbol.iterator]().next().value?.segment || DEFAULT_INITIAL
+
+  if (graphemeSegmenter) {
+    return graphemeSegmenter.segment(value)[Symbol.iterator]().next().value?.segment || DEFAULT_INITIAL
+  }
+
   return Array.from(value)[0] || DEFAULT_INITIAL
 }
 
 export default function ProfileAvatar({ profile, size = 'default', className = '' }) {
-  return <Avatar size={size} className={className}>{profile?.avatar || getInitial(profile?.name)}</Avatar>
+  const avatar = profile?.avatar || getInitial(profile?.name)
+
+  return (
+    <Avatar size={size} className={className}>
+      {avatar}
+    </Avatar>
+  )
 }
