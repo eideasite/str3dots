@@ -1,6 +1,6 @@
 import { useDeferredValue, useRef, useState } from 'react'
-import { Alert, Button, Card, Drawer, Statistic, Typography } from 'antd'
-import { ExportOutlined, RobotOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Drawer, Dropdown, Statistic, Typography } from 'antd'
+import { ArrowRightOutlined, DownOutlined, ExportOutlined, EyeOutlined, FilePdfOutlined, RobotOutlined, SaveOutlined } from '@ant-design/icons'
 import ArticleBodyEditor from '../components/editor/ArticleBodyEditor.jsx'
 import ArticleStatusTag from '../components/common/ArticleStatusTag.jsx'
 import ArticleTitleInput from '../components/editor/ArticleTitleInput.jsx'
@@ -189,25 +189,40 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
   return (
     <div className="page-wrap editor-page">
       <EditorToolbar
-        article={article}
         focusMode={focusMode}
         onToggleFocus={onToggleFocus}
-        onOpenSeo={onOpenSeo}
-        onManage={onManage}
-        onDiscard={onDiscard}
         onBackHome={onBackHome}
-        onSaveDraft={onSaveDraft}
-        onPreview={onPreview}
-        onDownloadPdf={onDownloadPdf}
         onAskGemini={() => setGeminiOpen(true)}
       />
-      <Alert
-        className="local-notice editor-save-status"
-        showIcon
-        type={saveStatus === 'error' ? 'error' : saveStatus === 'conflict' ? 'warning' : saveStatus === 'saved' ? 'success' : 'info'}
-        message={t(saveStatus === 'error' ? 'Save failed' : saveStatus === 'conflict' ? 'Another tab changed this workspace.' : saveStatus === 'saved' ? 'Saved in this browser' : 'Saving draft...')}
-        description={t(saveStatus === 'error' ? 'Your edits remain in this editor. Try saving again.' : saveStatus === 'conflict' ? 'Saving here is paused to protect the newer data. Copy any unsaved text before reloading this page.' : saveStatus === 'saved' ? 'Your draft changes are stored in this browser.' : 'Your draft changes are being saved in this browser.')}
-      />
+      <div className="editor-save-actions-row">
+        <Alert
+          className="local-notice editor-save-status"
+          showIcon
+          type={saveStatus === 'error' ? 'error' : saveStatus === 'conflict' ? 'warning' : saveStatus === 'saved' ? 'success' : 'info'}
+          message={t(saveStatus === 'error' ? 'Save failed' : saveStatus === 'conflict' ? 'Another tab changed this workspace.' : saveStatus === 'saved' ? 'Saved in this browser' : 'Saving draft...')}
+          description={t(saveStatus === 'error' ? 'Your edits remain in this editor. Try saving again.' : saveStatus === 'conflict' ? 'Saving here is paused to protect the newer data. Copy any unsaved text before reloading this page.' : saveStatus === 'saved' ? 'Your draft changes are stored in this browser.' : 'Your draft changes are being saved in this browser.')}
+        />
+        <div className="editor-save-actions-buttons">
+          <Dropdown
+            menu={{
+              items: [
+                { key: 'articles', label: t('Articles Management') },
+                ...(article?.status === 'draft' ? [{ key: 'discard', label: t('Discard Draft'), danger: true }] : []),
+              ],
+              onClick: ({ key }) => (key === 'discard' ? onDiscard?.() : onManage?.()),
+            }}
+            trigger={['click']}
+          >
+            <Button className="editor-manage-button">{t('Manage')} <DownOutlined /></Button>
+          </Dropdown>
+          <Button className="editor-next-button" type="primary" onClick={onOpenSeo}>
+            {t('Next')} <ArrowRightOutlined />
+          </Button>
+          <Button className="editor-pdf-button" icon={<FilePdfOutlined />} title={t('Choose Save as PDF in the browser print dialog.')} onClick={onDownloadPdf}>{t('Print / Save as PDF')}</Button>
+          <Button className="editor-save-draft-button" icon={<SaveOutlined />} onClick={onSaveDraft}>{t('Save Draft')}</Button>
+          <Button className="editor-preview-button" icon={<EyeOutlined />} onClick={onPreview}>{t('Preview')}</Button>
+        </div>
+      </div>
       <Card className="surface-card editor-card">
         <div className="editor-meta"><Text type="secondary">{t('Article title')}</Text><ArticleStatusTag status={article.status} /></div>
         <ArticleTitleInput value={article.title} onChange={(title) => onChange({ title })} />

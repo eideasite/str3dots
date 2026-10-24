@@ -3,12 +3,9 @@ import { Button, Dropdown, Input, Popover, Space, Tooltip, Typography } from 'an
 import {
   AlignLeftOutlined,
   ArrowLeftOutlined,
-  ArrowRightOutlined,
   BoldOutlined,
   CodeOutlined,
   DownOutlined,
-  EyeOutlined,
-  FilePdfOutlined,
   FullscreenOutlined,
   FullscreenExitOutlined,
   ItalicOutlined,
@@ -16,7 +13,6 @@ import {
   OrderedListOutlined,
   PictureOutlined,
   CommentOutlined,
-  SaveOutlined,
   RobotOutlined,
   UnorderedListOutlined,
   UnderlineOutlined,
@@ -140,12 +136,8 @@ export function EditorFormatToolbar({ onFormat, activeFormats = {} }) {
   )
 }
 
-export default function EditorToolbar({ article, focusMode = false, onToggleFocus, onOpenSeo, onManage, onDiscard, onBackHome, onSaveDraft, onPreview, onDownloadPdf, onAskGemini }) {
+export default function EditorToolbar({ focusMode = false, onToggleFocus, onBackHome, onAskGemini }) {
   const { t } = useLanguage()
-  const manageItems = [
-    { key: 'articles', label: t('Articles Management') },
-    ...(article?.status === 'draft' ? [{ key: 'discard', label: t('Discard Draft'), danger: true }] : []),
-  ]
 
   return (
     <div className="editor-flow-toolbar">
@@ -155,26 +147,11 @@ export default function EditorToolbar({ article, focusMode = false, onToggleFocu
         <Typography.Paragraph>{t('Write and edit your article. Your draft is saved in this browser.')}</Typography.Paragraph>
       </div>
       <div className="editor-flow-actions">
+        <Button type="text" className="editor-back-home-button" icon={<ArrowLeftOutlined />} onClick={onBackHome}>{t('Back')}</Button>
+        <Button className="editor-gemini-button" icon={<RobotOutlined />} onClick={onAskGemini}>{t('Ask Gemini')}</Button>
         <Tooltip title={t(focusMode ? 'Exit focus mode' : 'Focus mode')}>
           <Button className="editor-focus-toggle" type={focusMode ? 'primary' : 'default'} icon={focusMode ? <FullscreenExitOutlined /> : <FullscreenOutlined />} aria-label={t(focusMode ? 'Exit focus mode' : 'Focus mode')} aria-pressed={focusMode} onClick={onToggleFocus} />
         </Tooltip>
-        <Button type="text" className="editor-back-home-button" icon={<ArrowLeftOutlined />} onClick={onBackHome}>{t('Back')}</Button>
-        <Button className="editor-save-draft-button" icon={<SaveOutlined />} onClick={onSaveDraft}>{t('Save Draft')}</Button>
-        <Button className="editor-preview-button" icon={<EyeOutlined />} onClick={onPreview}>{t('Preview')}</Button>
-        <Button className="editor-gemini-button" icon={<RobotOutlined />} onClick={onAskGemini}>{t('Ask Gemini')}</Button>
-        <Button className="editor-pdf-button" icon={<FilePdfOutlined />} title={t('Choose Save as PDF in the browser print dialog.')} onClick={onDownloadPdf}>{t('Print / Save as PDF')}</Button>
-        <Dropdown
-          menu={{
-            items: manageItems,
-            onClick: ({ key }) => (key === 'discard' ? onDiscard?.() : onManage?.()),
-          }}
-          trigger={['click']}
-        >
-          <Button className="editor-manage-button">{t('Manage')} <DownOutlined /></Button>
-        </Dropdown>
-        <Button className="editor-next-button" type="primary" onClick={onOpenSeo}>
-          {t('Next')} <ArrowRightOutlined />
-        </Button>
       </div>
     </div>
   )

@@ -236,7 +236,7 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
                     <Typography.Text className="home-post-author-name" strong>{profile.name || t('Writer')}</Typography.Text>
                     <div className="home-post-meta">
                       <Typography.Text type="secondary">{formatDate(post.createdAt, { dateStyle: 'medium', timeStyle: 'short' }, getDateLocale(language))} · {t('Local post')}</Typography.Text>
-                      <span className="home-post-number-chip" aria-label={`Post number ${postNumber}`} title={`Post ${postNumber} for this day`}>#{postNumber}</span>
+                      <span className="home-post-number-chip" aria-label={`Post number ${postNumber}`} title={`Post ${postNumber} for this day`}>{postNumber}</span>
                     </div>
                   </div>
                 </div>
