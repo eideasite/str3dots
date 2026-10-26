@@ -1,5 +1,7 @@
 * { box-sizing: border-box; }
 html {
+  width: 100%;
+  max-width: 100%;
   min-width: 320px;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -7,10 +9,11 @@ html {
   writing-mode: horizontal-tb;
   text-orientation: mixed;
 }
-body { margin: 0; min-width: 320px; min-height: 100vh; min-height: 100svh; }
+body { width: 100%; max-width: 100%; margin: 0; min-width: 320px; min-height: 100vh; min-height: 100svh; }
+#root { width: 100%; min-width: 0; }
 button, input, textarea { font: inherit; }
 ::selection { background: #dedede; color: #111; }
-.app-layout { min-height: 100vh; min-height: 100svh; background: var(--page-bg); zoom: var(--app-display-scale, 1); }
+.app-layout { width: 100vw; max-width: 100%; min-width: 0; min-height: 100vh; min-height: 100svh; background: var(--page-bg); zoom: var(--app-display-scale, 1); }
 .sider-brand { display: flex; align-items: center; gap: 12px; width: 100%; padding: 24px 20px 30px; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
 .sider-brand:hover { background: var(--surface-selected); }
 .sider-brand:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
@@ -24,7 +27,7 @@ button, input, textarea { font: inherit; }
 .storage-indicator { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #222; }
 .storage-indicator.saving { background: #999; }
 .storage-indicator.error { background: #555; }
-.app-main-layout { min-width: 0; min-height: 100vh; min-height: 100svh; margin-left: 0; background: var(--page-bg); }
+.app-main-layout { width: 100%; max-width: 100%; min-width: 0; min-height: 100vh; min-height: 100svh; margin-left: 0; background: var(--page-bg); }
 .app-header { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: auto minmax(0, 420px) minmax(0, 1fr); align-items: center; column-gap: 24px; height: 64px; padding: 0 34px; background: var(--surface); border-bottom: 1px solid var(--line); backdrop-filter: blur(10px); }
 .header-tools { grid-column: 3; display: flex; min-width: 0; align-items: center; justify-self: end; gap: 12px; }
 .google-ai-search { grid-column: 2; justify-self: center; display: flex; align-items: center; gap: 0; width: min(100%, 420px); min-width: 0; height: 46px; padding: 2px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); box-shadow: 0 2px 10px rgba(0, 0, 0, .06); transition: border-color .18s ease, box-shadow .18s ease; }
@@ -45,7 +48,7 @@ button, input, textarea { font: inherit; }
 .header-note { flex: 0 0 auto; font-size: 0.75rem; white-space: nowrap; }
 .mobile-brand { display: flex; min-width: 0; align-items: center; gap: 10px; font-size: 0.8125rem; }
 .mobile-brand .brand-mark { width: 32px; height: 32px; border-radius: 10px; }
-.app-content { min-width: 0; min-height: calc(100vh - 64px); }
+.app-content { width: 100%; max-width: 100%; min-width: 0; min-height: calc(100vh - 64px); }
 .app-footer {
   display: flex;
   align-items: center;

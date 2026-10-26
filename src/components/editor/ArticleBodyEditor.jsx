@@ -12,11 +12,31 @@ function isLegacyObjectPlaceholder(value) {
   return typeof value === 'string' && richTextToPlainText(value).trim() === '[object Object]'
 }
 
-const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChange, onSelectionChange }, forwardedRef) {
+const MOBILE_COMMANDS = {
+  '11;': { format: 'bold', mode: 'bold' },
+  '22;': { format: 'fontIncrease', mode: 'fontIncrease' },
+  '21;': { format: 'fontDecrease', mode: 'fontDecrease' },
+  '31;': { format: 'underline', mode: 'underline' },
+  '33;': { format: 'italic', mode: 'italic' },
+  '44;': { format: 'bullet', mode: 'bullet' },
+  '45;': { format: 'number', mode: 'number' },
+  '46;': { format: 'quote', mode: 'quote' },
+  '40;': { format: 'rule' },
+  '50;': { format: 'link' },
+  '54;': { format: 'image' },
+  '55;': { format: 'codeblock', mode: 'codeblock' },
+  '1;': { format: 'heading1' },
+  '2;': { format: 'heading2' },
+  '3;': { format: 'heading3' },
+}
+
+const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChange, onSelectionChange, onMobileCommand }, forwardedRef) {
   const { message } = App.useApp()
   const { t } = useLanguage()
   const localRef = useRef(null)
   const editedRef = useRef(false)
+  const mobileModesRef = useRef([])
+  const mobileSizeRangeRef = useRef(null)
   const setEditorRef = useCallback((node) => {
     localRef.current = node
     if (typeof forwardedRef === 'function') forwardedRef(node)
@@ -33,10 +53,100 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
     if (editor.innerHTML !== safeHtml) editor.innerHTML = safeHtml
   }, [value])
 
+  const consumeMobileCommand = (editor) => {
+    if (!window.matchMedia?.('(max-width: 700px)').matches) return false
+    const selection = window.getSelection()
+    const node = selection?.anchorNode
+    if (!selection?.isCollapsed || node?.nodeType !== Node.TEXT_NODE || !editor.contains(node)) return false
+    const beforeCaret = node.textContent.slice(0, selection.anchorOffset)
+    let token = beforeCaret.endsWith(';;') ? ';;' : Object.keys(MOBILE_COMMANDS).find((candidate) => beforeCaret.endsWith(candidate))
+    if (!token) return false
+    const tokenStart = selection.anchorOffset - token.length
+    if (token !== ';;' && tokenStart > 0 && !/\s/.test(node.textContent[tokenStart - 1])) return false
+
+    const range = document.createRange()
+    range.setStart(node, tokenStart)
+    range.setEnd(node, selection.anchorOffset)
+    range.deleteContents()
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    if (token === ';;') {
+      const modes = [...mobileModesRef.current].reverse()
+      mobileModesRef.current = []
+      mobileSizeRangeRef.current = null
+      modes.forEach((mode) => onMobileCommand?.('mobileEnd', mode))
+      return true
+    }
+
+    const command = MOBILE_COMMANDS[token]
+    if (command.mode) {
+      const currentModes = mobileModesRef.current
+      if (currentModes.includes(command.mode)) {
+        mobileModesRef.current = currentModes.filter((mode) => mode !== command.mode)
+        if (command.mode.startsWith('font')) mobileSizeRangeRef.current = null
+        onMobileCommand?.('mobileEnd', command.mode)
+      } else {
+        if (command.mode.startsWith('font')) {
+          mobileModesRef.current = currentModes.filter((mode) => !mode.startsWith('font'))
+          const startRange = selection.getRangeAt(0).cloneRange()
+          startRange.collapse(true)
+          mobileSizeRangeRef.current = startRange
+        }
+        mobileModesRef.current = [...mobileModesRef.current, command.mode]
+        onMobileCommand?.(command.format)
+      }
+    } else if (command.format === 'link' || command.format === 'image') {
+      const label = command.format === 'link' ? t('Enter link URL') : t('Enter image URL')
+      const url = window.prompt(label, 'https://')
+      if (url?.trim()) onMobileCommand?.(command.format, url.trim())
+    } else {
+      onMobileCommand?.(command.format)
+    }
+    return true
+  }
+
+  const applyMobileSizeToInput = (editor) => {
+    const sizeMode = [...mobileModesRef.current].reverse().find((mode) => mode.startsWith('font'))
+    const start = mobileSizeRangeRef.current
+    const selection = window.getSelection()
+    if (!sizeMode || !start || !selection?.isCollapsed || !editor.contains(selection.anchorNode)) return
+    try {
+      const range = document.createRange()
+      range.setStart(start.startContainer, start.startOffset)
+      range.setEnd(selection.anchorNode, selection.anchorOffset)
+      if (range.collapsed || !range.toString()) return
+      const span = document.createElement('span')
+      span.setAttribute('data-text-size', sizeMode === 'fontIncrease' ? '3' : '1')
+      span.append(range.extractContents())
+      range.insertNode(span)
+      const previous = span.previousSibling
+      const nextStart = previous?.nodeType === Node.ELEMENT_NODE
+        && previous.tagName === 'SPAN'
+        && previous.getAttribute('data-text-size') === span.getAttribute('data-text-size')
+        ? previous
+        : span
+      if (nextStart !== span) {
+        while (span.firstChild) nextStart.append(span.firstChild)
+        span.remove()
+      }
+      const caret = document.createRange()
+      caret.setStartAfter(nextStart)
+      caret.collapse(true)
+      selection.removeAllRanges()
+      selection.addRange(caret)
+      mobileSizeRangeRef.current = caret.cloneRange()
+    } catch {
+      mobileSizeRangeRef.current = null
+    }
+  }
+
   const handleInput = (event) => {
     // Keep the live DOM and cursor untouched, but persist only allowlisted markup.
     editedRef.current = true
-    onChange(sanitizeRichTextHtml(event.currentTarget.innerHTML))
+    const editor = event.currentTarget
+    if (!consumeMobileCommand(editor)) applyMobileSizeToInput(editor)
+    onChange(sanitizeRichTextHtml(editor.innerHTML))
   }
 
   const handleBlur = (event) => {

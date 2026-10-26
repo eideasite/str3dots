@@ -6,6 +6,7 @@ import { GeminiMark } from '../components/common/AiBrandIcons.jsx'
 import LoadingState from '../components/common/LoadingState.jsx'
 import { useConnectivityStatus } from '../hooks/useConnectivityStatus.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import ConversationFeedback from '../components/common/ConversationFeedback.jsx'
 
 const { Content } = Layout
 const navItems = [
@@ -107,7 +108,7 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
               <div className="network-estimate-compact-copy">
                 <Typography.Text strong>{t('Network status')}</Typography.Text>
                 <Typography.Text type="secondary">{networkStatusSummary}</Typography.Text>
-                <Popover content={networkInfoContent} title={t('Network details')} trigger="click" placement="bottom" overlayClassName="network-estimate-popover">
+                <Popover content={networkInfoContent} title={t('Network details')} trigger="click" placement="bottomRight" overlayClassName="network-estimate-popover">
                   <Button className="network-estimate-info-button" type="text" icon={<InfoCircleOutlined />} aria-label={t('Network details')} />
                 </Popover>
               </div>
@@ -116,6 +117,7 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
           />}
           {online && showRestored && <Alert className="connectivity-status connectivity-restored" banner showIcon type="success" role="status" message={t('The browser reports that a connection is available again.')} description={t('This does not confirm that every online service is reachable.')} />}
           {children}
+          <ConversationFeedback />
           <footer className="app-footer">
             <span>© {new Date().getFullYear()} Jeyamohan. {t('All rights reserved.')}</span>
             <span>

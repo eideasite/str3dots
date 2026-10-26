@@ -23,6 +23,7 @@ const FORMAT_COMMANDS = {
   rule: ['insertHorizontalRule'],
   heading1: ['formatBlock', 'h1'],
   heading2: ['formatBlock', 'h2'],
+  heading3: ['formatBlock', 'h3'],
   paragraph: ['formatBlock', 'p'],
 }
 
@@ -47,6 +48,7 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
     const blockElement = activeElement?.closest('h1, h2, p, div, blockquote, pre')
     const block = blockElement?.tagName === 'H1' ? 'heading1'
       : blockElement?.tagName === 'H2' ? 'heading2'
+        : blockElement?.tagName === 'H3' ? 'heading3'
         : blockElement?.tagName === 'P' || blockElement?.tagName === 'DIV' ? 'paragraph'
           : null
     const inside = (tag) => Boolean(activeElement?.closest(tag))
@@ -166,6 +168,17 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
     commitEditor()
   }
 
+  const handleMobileCommand = (format, value) => {
+    rememberSelection()
+    if (format === 'mobileEnd') {
+      if (value === 'quote' || value === 'codeblock') applyFormat('paragraph')
+      else if (!value.startsWith('font')) applyFormat(value)
+      return
+    }
+    if (format === 'fontIncrease' || format === 'fontDecrease') return
+    applyFormat(format, value)
+  }
+
   if (!article) {
     return (
       <div className="page-wrap editor-page">
@@ -229,7 +242,18 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
         <div className="editor-compose-row">
           <EditorFormatToolbar onFormat={applyFormat} activeFormats={activeFormats} />
           <div className="editor-compose-body">
-            <ArticleBodyEditor ref={bodyRef} value={article.body} onChange={(body) => onChange({ body })} onSelectionChange={rememberSelection} />
+            <details className="mobile-command-reference">
+              <summary>{t('Mobile editing codes')}</summary>
+              <p>{t('Type a code followed by ; in the writing area. Type ;; to finish an active format.')}</p>
+              <ul>
+                <li><code>1;</code> {t('Title')} · <code>2;</code> {t('Heading')} · <code>3;</code> {t('Subheading')}</li>
+                <li><code>11;</code> {t('Bold')} · <code>31;</code> {t('Underline')} · <code>33;</code> {t('Italic')}</li>
+                <li><code>22;</code> {t('Increase text size')} · <code>21;</code> {t('Decrease text size')}</li>
+                <li><code>44;</code> {t('Bulleted list')} · <code>45;</code> {t('Numbered list')} · <code>46;</code> {t('Quote')}</li>
+                <li><code>40;</code> {t('Horizontal line')} · <code>50;</code> {t('Link')} · <code>54;</code> {t('Image')} · <code>55;</code> {t('Code block')}</li>
+              </ul>
+            </details>
+            <ArticleBodyEditor ref={bodyRef} value={article.body} onChange={(body) => onChange({ body })} onSelectionChange={rememberSelection} onMobileCommand={handleMobileCommand} />
           </div>
         </div>
         <div className="editor-footer"><Text type="secondary">{plainBody.length} {t('characters')}</Text><Text type="secondary">{words} {t('words')} | {readingMinutes} {t('min read')}</Text></div>

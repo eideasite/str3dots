@@ -23,6 +23,7 @@ const formatItems = [
   { key: 'paragraph', label: 'Paragraph' },
   { key: 'heading1', label: 'Heading 1' },
   { key: 'heading2', label: 'Heading 2' },
+  { key: 'heading3', label: 'Subheading' },
 ]
 
 const formatActions = [
