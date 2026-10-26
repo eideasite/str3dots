@@ -118,6 +118,32 @@ Object.assign(tamil, {
   'Contact:': 'தொடர்புக்கு:',
 })
 
+Object.assign(tamil, {
+  'YOUR WRITING': 'உங்கள் எழுத்து',
+  'External AI tools': 'வெளிப்புற AI கருவிகள்',
+  'These services operate separately from your writing workspace. This app does not send drafts or article content when you open a tool.': 'இந்த சேவைகள் உங்கள் எழுதும் இடத்திலிருந்து தனியாக இயங்கும். கருவியைத் திறக்கும்போது உங்கள் வரைவுகள் அல்லது கட்டுரை உள்ளடக்கம் அனுப்பப்படாது.',
+  'Ask with AI': 'AI-யிடம் கேளுங்கள்',
+  'Got it': 'சரி',
+  'Google AI opens with your prompt. Gemini opens separately with the prompt copied for you to paste.': 'உங்கள் prompt உடன் Google AI திறக்கும். Gemini தனியாகத் திறக்கும்; prompt தானாக copy ஆகும், அதை அங்கே paste செய்யுங்கள்.',
+  'Expand prompt editor': 'நீளமான prompt எழுத விரிவாக்கு',
+  'Use a single-line prompt': 'ஒரே வரி prompt-க்கு மாற்று',
+  'What would you like to ask?': 'என்ன கேட்க விரும்புகிறீர்கள்?',
+  'Open this prompt in both services': 'இந்த prompt-ஐ இரு சேவைகளிலும் திற',
+  'Open both with this prompt': 'இந்த prompt-ஐ இரண்டிலும் திற',
+  'Click the arrow to open both tabs.': 'அம்புக்குறியை அழுத்தி இரு tab-களையும் திறக்கவும்.',
+  'Press Enter to open both tabs.': 'இரு tab-களையும் திற Enter அழுத்தவும்.',
+  'Prompt copied to your clipboard. Paste it into Gemini to get a response.': 'Prompt clipboard-க்கு copy ஆனது. பதிலைப் பெற Gemini-யில் paste செய்யுங்கள்.',
+  'Could not copy the prompt. Copy it here and paste it into Gemini.': 'Prompt-ஐ copy செய்ய முடியவில்லை. இங்கிருந்து copy செய்து Gemini-யில் paste செய்யுங்கள்.',
+  'Your browser blocked the new tab. Allow pop-ups and try again.': 'உங்கள் browser புதிய tab-ஐ தடுத்தது. Pop-up-களை அனுமதித்து மீண்டும் முயற்சிக்கவும்.',
+  'Your browser blocked one or more tabs. Allow pop-ups and try again.': 'உங்கள் browser சில tab-களைத் தடுத்தது. Pop-up-களை அனுமதித்து மீண்டும் முயற்சிக்கவும்.',
+  'Enter a prompt to continue.': 'தொடர prompt உள்ளிடவும்.',
+  'Ask Google AI': 'Google AI-யிடம் கேள்',
+  'Ask Gemini': 'Gemini-யிடம் கேள்',
+  'About Google AI and Gemini': 'Google AI மற்றும் Gemini பற்றி',
+  'Google AI accepts the prompt in its search link. Gemini does not support prompt-prefill links, so this app copies your prompt and opens Gemini for you to paste it.': 'Google AI, search link மூலம் prompt-ஐப் பெறும். Gemini link வழியாக prompt நிரப்புவதை ஆதரிக்காது. அதனால் இந்த app prompt-ஐ copy செய்து Gemini-ஐத் திறக்கும்; அங்கே paste செய்யுங்கள்.',
+  'Only the prompt you type here is shared. Your drafts and article content are not sent.': 'நீங்கள் இங்கே எழுதும் prompt மட்டுமே பகிரப்படும். உங்கள் draft அல்லது கட்டுரை உள்ளடக்கம் அனுப்பப்படாது.',
+})
+
 const english = Object.fromEntries(Object.entries(tamil).map(([key, value]) => [value, key]))
 const LanguageContext = createContext('en')
 
