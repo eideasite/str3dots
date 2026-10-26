@@ -15,6 +15,8 @@
 .network-estimate-popover { max-width: calc(100vw - 24px); }
 .network-estimate-popover .ant-popover-inner { width: min(424px, calc(100vw - 24px)); max-width: calc(100vw - 24px); }
 .network-estimate-compact .connectivity-check-button.ant-btn { min-height: 32px; height: 32px; padding-inline: 11px; }
+.network-estimate-close-button.ant-btn { width: 32px; min-width: 32px; height: 32px; flex: 0 0 32px; padding: 0; border-radius: 50%; color: var(--muted); }
+.network-estimate-close-button.ant-btn:hover { background: var(--surface-selected); color: var(--ink); }
 .connectivity-offline .ant-alert-message, .network-estimate-status .ant-alert-message { color: var(--ink); font-weight: 650; }
 .connectivity-offline .ant-alert-description, .network-estimate-status .ant-alert-description { color: var(--muted); line-height: 1.6; }
 .network-estimate-slow .ant-alert-icon { color: #ad6800 !important; }
@@ -663,6 +665,7 @@
   .network-estimate-compact-copy .network-estimate-info-button { grid-column: 2; grid-row: 2; }
   .network-estimate-info-button.ant-btn { width: 42px; min-width: 42px; height: 42px; min-height: 42px; }
   .network-estimate-compact .connectivity-check-button.ant-btn { min-height: 42px; height: 42px; padding-inline: 8px; font-size: 0.75rem; }
+  .network-estimate-close-button.ant-btn { width: 36px; min-width: 36px; height: 36px; flex-basis: 36px; }
   .surface-card { border-radius: var(--ui-radius-card) !important; }
   .editor-page-heading { align-items: flex-start; flex-direction: column; }
   .editor-page-heading .ant-space { justify-content: flex-start; }

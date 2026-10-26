@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Alert, Button, Drawer, Layout, Menu, Popover, Typography } from 'antd'
-import { InboxOutlined, BookOutlined, FileTextOutlined, InfoCircleOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons'
+import { InboxOutlined, BookOutlined, CloseOutlined, FileTextOutlined, InfoCircleOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons'
 import AppHeader from '../components/common/AppHeader.jsx'
 import { GeminiMark } from '../components/common/AiBrandIcons.jsx'
 import LoadingState from '../components/common/LoadingState.jsx'
@@ -24,6 +24,7 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
   const { t } = useLanguage()
   const { online, showRestored, checkConnection, checkResult, networkEstimate, liveSpeedTest, refreshingEstimate, refreshNetworkEstimate } = useConnectivityStatus()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [networkStatusDismissed, setNetworkStatusDismissed] = useState(false)
   const estimateType = {
     'slow-2g': t('Very slow (slow 2G estimate)'),
     '2g': t('Slow (2G estimate)'),
@@ -98,7 +99,7 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
               <Button className="connectivity-check-button" icon={<ReloadOutlined />} onClick={checkConnection}>{t('Check connection')}</Button>
             </div>}
           />}
-          {online && <Alert
+          {online && !networkStatusDismissed && <Alert
             className={`connectivity-status network-estimate-status network-estimate-compact${isSlowConnection ? ' network-estimate-slow' : ''}`}
             banner
             showIcon={false}
@@ -113,6 +114,7 @@ export default function MainLayout({ page, focusMode = false, onNavigate, saveSt
                 </Popover>
               </div>
               <Button className="connectivity-check-button" size="small" icon={<ReloadOutlined />} loading={refreshingEstimate} disabled={refreshingEstimate} onClick={refreshNetworkEstimate}>{t(refreshingEstimate ? 'Testing connection...' : 'Run speed test')}</Button>
+              <Button className="network-estimate-close-button" type="text" icon={<CloseOutlined />} aria-label={t('Close network status')} onClick={() => setNetworkStatusDismissed(true)} />
             </div>}
           />}
           {online && showRestored && <Alert className="connectivity-status connectivity-restored" banner showIcon type="success" role="status" message={t('The browser reports that a connection is available again.')} description={t('This does not confirm that every online service is reachable.')} />}

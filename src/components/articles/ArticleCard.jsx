@@ -20,7 +20,7 @@ export default function ArticleCard({ article, onOpen, onAction, isBookmarked, i
     () => formatDate(article.updatedAt, undefined, getDateLocale(language)),
     [article.updatedAt, language],
   )
-  const openLabel = t(article.status === 'published' ? 'View article' : 'Open article')
+  const openLabel = t('View article')
   const articleOpenLabel = `${openLabel}: ${title}`
 
   return (

@@ -15,7 +15,7 @@ const EMOJIS = ['🙂', '😊', '❤️', '👏', '🙏', '✨', '🌿', '💭']
 const ACCEPTED_IMAGES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024
 
-export default function QuickComposerPage({ profile, posts = [], articles = [], highlights = [], bookmarkedIds = [], shortcutIds = [], pinnedIds = [], onToggleBookmark, onToggleShortcut, onTogglePin, onSaveHighlights, onCreatePost, onWriteArticle, onOpenArticle, onArticleAction }) {
+export default function QuickComposerPage({ profile, posts = [], articles = [], highlights = [], bookmarkedIds = [], shortcutIds = [], pinnedIds = [], onToggleBookmark, onToggleShortcut, onTogglePin, onSaveHighlights, onCreatePost, onWriteArticle, onPreviewArticle, onArticleAction }) {
   const { t, language } = useLanguage()
   const [open, setOpen] = useState(false)
   const [posting, setPosting] = useState(false)
@@ -161,7 +161,7 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
   const articleListProps = {
     filter: 'all',
     articleSampleNumbers,
-    onOpen: onOpenArticle,
+    onOpen: onPreviewArticle,
     onAction: onArticleAction,
     bookmarkedIds,
     shortcutIds,
@@ -292,7 +292,7 @@ export default function QuickComposerPage({ profile, posts = [], articles = [], 
         <ArticleList
           articles={shortcutArticles}
           filter="all"
-          onOpen={onOpenArticle}
+          onOpen={onPreviewArticle}
           bookmarkedIds={bookmarkedIds}
           shortcutIds={shortcutIds}
           pinnedIds={pinnedIds}

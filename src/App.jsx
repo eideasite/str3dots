@@ -372,10 +372,10 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
     }
     navigateTo(destination)
   }
-  const openArticle = (article) => {
-    setEditorReturnPage(page)
+  const previewArticle = (article) => {
+    if (!article) return
     setActiveArticleId(article.id)
-    navigateTo(article.status === 'published' ? 'published' : 'editor', { articleId: article.id })
+    setPreviewOpen(true)
   }
   const openSeo = (returnPage = page, articleId = activeArticleId) => {
     setSeoReturnPage(returnPage)
@@ -526,7 +526,7 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
 
   let pageContent
   if (page === 'compose') {
-    pageContent = <QuickComposerPage profile={workspace.profile} posts={posts} articles={workspace.articles} highlights={highlights} bookmarkedIds={bookmarkedArticleIds} shortcutIds={homeShortcutArticleIds} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} onToggleBookmark={toggleArticleBookmark} onToggleShortcut={toggleHomeArticleShortcut} onSaveHighlights={saveHighlightList} onCreatePost={createPost} onWriteArticle={() => createArticle()} onOpenArticle={openArticle} onArticleAction={handleArticleAction} />
+    pageContent = <QuickComposerPage profile={workspace.profile} posts={posts} articles={workspace.articles} highlights={highlights} bookmarkedIds={bookmarkedArticleIds} shortcutIds={homeShortcutArticleIds} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} onToggleBookmark={toggleArticleBookmark} onToggleShortcut={toggleHomeArticleShortcut} onSaveHighlights={saveHighlightList} onCreatePost={createPost} onWriteArticle={() => createArticle()} onPreviewArticle={previewArticle} onArticleAction={handleArticleAction} />
   } else if (page === 'profile') {
     pageContent = <ProfilePage profile={workspace.profile} onChange={(profile) => updateWorkspace((current) => ({ ...current, profile }))} onContinue={continueFromProfile} />
   } else if (page === 'editor') {
@@ -536,11 +536,11 @@ function AppContent({ themeMode, onThemeChange, language, onLanguageChange }) {
   } else if (page === 'published') {
     pageContent = <PublishedPostPage article={activeArticle} onBack={() => goBack('articles')} onEdit={() => navigateTo('editor')} onShare={() => openShare()} onDownloadPdf={() => setPrintingArticle(activeArticle)} />
   } else if (page === 'articles') {
-    pageContent = <ArticlesManagementPage articles={workspace.articles.filter((article) => !article.archived)} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} onCreate={createArticle} onOpen={openArticle} onAction={handleArticleAction} />
+    pageContent = <ArticlesManagementPage articles={workspace.articles.filter((article) => !article.archived)} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} onCreate={createArticle} onOpen={previewArticle} onAction={handleArticleAction} />
   } else if (page === 'bookmarks') {
-    pageContent = <BookmarksPage articles={workspace.articles} bookmarkedIds={bookmarkedArticleIds} shortcutIds={homeShortcutArticleIds} pinnedIds={pinnedArticleIds} onOpen={openArticle} onToggleBookmark={toggleArticleBookmark} onToggleShortcut={toggleHomeArticleShortcut} onTogglePin={toggleArticlePin} />
+    pageContent = <BookmarksPage articles={workspace.articles} bookmarkedIds={bookmarkedArticleIds} shortcutIds={homeShortcutArticleIds} pinnedIds={pinnedArticleIds} onOpen={previewArticle} onToggleBookmark={toggleArticleBookmark} onToggleShortcut={toggleHomeArticleShortcut} onTogglePin={toggleArticlePin} />
   } else if (page === 'archive') {
-    pageContent = <ArchivePage articles={workspace.articles.filter((article) => article.archived)} onOpen={openArticle} onAction={handleArticleAction} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} />
+    pageContent = <ArchivePage articles={workspace.articles.filter((article) => article.archived)} onOpen={previewArticle} onAction={handleArticleAction} pinnedIds={pinnedArticleIds} onTogglePin={toggleArticlePin} />
   } else if (page === 'external-ai-tools') {
     pageContent = <ExternalAiToolsPage />
   } else {
