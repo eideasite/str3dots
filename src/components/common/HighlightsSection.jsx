@@ -149,7 +149,8 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
 
   const moveCarousel = (direction) => {
     const isMobile = window.matchMedia?.('(max-width: 700px)').matches
-    carouselRef.current?.scrollBy({ left: isMobile ? 0 : direction * 210, top: isMobile ? direction * 150 : 0, behavior: 'smooth' })
+    const behavior = document.documentElement.dataset.reduceMotion === 'true' ? 'auto' : 'smooth'
+    carouselRef.current?.scrollBy({ left: isMobile ? 0 : direction * 210, top: isMobile ? direction * 150 : 0, behavior })
   }
   const modalTitle = view === 'edit'
     ? <Space><Button className="highlight-back-button" type="text" disabled={savingCollection} aria-label={t('Back to highlights')} icon={<ArrowLeftOutlined />} onClick={closeDialog} /><span>{t('Edit highlight collection')}</span></Space>
@@ -165,7 +166,7 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
         </Space>}
       </div>
       {highlights.length ? (
-        <div className="highlights-carousel" ref={carouselRef}>
+        <div className="highlights-carousel" ref={carouselRef} role="region" aria-label={t('Highlights list')} tabIndex={0}>
           {highlights.map((collection) => (
             <button className="highlight-tile" key={collection.id} type="button" onClick={() => beginEdit(collection)} aria-label={`${t('Edit')} ${collection.title}`}>
               <span className="highlight-cover"><HighlightImage className="highlight-cover-image" src={collection.items[0]?.src} alt="" fallbackLabel={t('Photo unavailable')} /></span>
