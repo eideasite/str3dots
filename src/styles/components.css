@@ -921,6 +921,23 @@
 .ant-input-number-affix-wrapper { border-radius: var(--ui-radius-control); }
 .ant-alert { border-radius: var(--ui-radius-control); }
 .ant-modal-content { border-radius: var(--ui-radius-panel); }
+.accessibility-result-group,
+.accessibility-menu-action.ant-btn,
+.dark-theme-settings-link.ant-btn,
+.dark-theme-toggle-card { border-radius: var(--ui-radius-card) !important; }
+
+/* Keep page, modal, editor, and card scroll areas visually consistent. */
+* { scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { min-height: 36px; border: 3px solid transparent; border-radius: 999px; background: color-mix(in srgb, var(--muted) 58%, transparent); background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background-color: var(--muted); }
+
+@media (max-width: 700px) {
+  .article-rich-editor,
+  .highlights-carousel,
+  .ant-modal-body { -webkit-overflow-scrolling: touch; }
+}
 
 /* Editor toolbar and save actions use one compact, responsive control system. */
 .editor-flow-toolbar { align-items: flex-start; gap: 20px; }
