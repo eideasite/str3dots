@@ -1,7 +1,7 @@
 import { notifyAppError } from '../../services/errorNotifications.js'
 import { useRef, useState } from 'react'
 import { Button, Empty, Input, Modal, Popconfirm, Space, Typography, message } from 'antd'
-import { ArrowLeftOutlined, CheckOutlined, DeleteOutlined, EditOutlined, LeftOutlined, PictureOutlined, PlusOutlined, RightOutlined, StarOutlined, UploadOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, CheckOutlined, DeleteOutlined, DownOutlined, EditOutlined, LeftOutlined, PictureOutlined, PlusOutlined, RightOutlined, StarOutlined, UpOutlined, UploadOutlined } from '@ant-design/icons'
 import { createHighlightCollection } from '../../services/highlightStorage.js'
 import { formatDate, getDateLocale } from '../../utils/formatDate.js'
 import { createId } from '../../utils/createId.js'
@@ -147,7 +147,10 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
     setView(null)
   }
 
-  const moveCarousel = (direction) => carouselRef.current?.scrollBy({ left: direction * 210, behavior: 'smooth' })
+  const moveCarousel = (direction) => {
+    const isMobile = window.matchMedia?.('(max-width: 700px)').matches
+    carouselRef.current?.scrollBy({ left: isMobile ? 0 : direction * 210, top: isMobile ? direction * 150 : 0, behavior: 'smooth' })
+  }
   const modalTitle = view === 'edit'
     ? <Space><Button className="highlight-back-button" type="text" disabled={savingCollection} aria-label={t('Back to highlights')} icon={<ArrowLeftOutlined />} onClick={closeDialog} /><span>{t('Edit highlight collection')}</span></Space>
     : t('Edit highlights')
@@ -157,8 +160,8 @@ export default function HighlightsSection({ profile, highlights = [], onSave }) 
       <div className="highlights-heading-row">
         <Typography.Title level={4}>{t('Highlights')}</Typography.Title>
         {highlights.length > 2 && <Space size={4}>
-          <Button type="text" aria-label={t('Previous highlights')} icon={<LeftOutlined />} onClick={() => moveCarousel(-1)} />
-          <Button type="text" aria-label={t('Next highlights')} icon={<RightOutlined />} onClick={() => moveCarousel(1)} />
+          <Button type="text" aria-label={t('Previous highlights')} icon={<><LeftOutlined className="highlight-scroll-horizontal-icon" /><UpOutlined className="highlight-scroll-vertical-icon" /></>} onClick={() => moveCarousel(-1)} />
+          <Button type="text" aria-label={t('Next highlights')} icon={<><RightOutlined className="highlight-scroll-horizontal-icon" /><DownOutlined className="highlight-scroll-vertical-icon" /></>} onClick={() => moveCarousel(1)} />
         </Space>}
       </div>
       {highlights.length ? (
