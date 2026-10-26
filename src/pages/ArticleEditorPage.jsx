@@ -172,7 +172,7 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
     rememberSelection()
     if (format === 'mobileEnd') {
       if (value === 'quote' || value === 'codeblock') applyFormat('paragraph')
-      else if (!value.startsWith('font')) applyFormat(value)
+      else if (!['fontIncrease', 'fontDecrease'].includes(value)) applyFormat(value)
       return
     }
     if (format === 'fontIncrease' || format === 'fontDecrease') return

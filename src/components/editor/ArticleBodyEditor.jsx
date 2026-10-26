@@ -29,6 +29,18 @@ const MOBILE_COMMANDS = {
   '2;': { format: 'heading2' },
   '3;': { format: 'heading3' },
 }
+const MOBILE_COMMAND_TOKENS = Object.keys(MOBILE_COMMANDS)
+const MOBILE_VIEWPORT_QUERY = '(max-width: 700px)'
+
+function isFontMode(mode) {
+  return mode === 'fontIncrease' || mode === 'fontDecrease'
+}
+
+function getMobileCommandToken(text, caretOffset) {
+  const beforeCaret = text.slice(0, caretOffset)
+  if (beforeCaret.endsWith(';;')) return ';;'
+  return MOBILE_COMMAND_TOKENS.find((token) => beforeCaret.endsWith(token)) || null
+}
 
 const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChange, onSelectionChange, onMobileCommand }, forwardedRef) {
   const { message } = App.useApp()
@@ -54,12 +66,11 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
   }, [value])
 
   const consumeMobileCommand = (editor) => {
-    if (!window.matchMedia?.('(max-width: 700px)').matches) return false
+    if (!window.matchMedia?.(MOBILE_VIEWPORT_QUERY).matches) return false
     const selection = window.getSelection()
     const node = selection?.anchorNode
     if (!selection?.isCollapsed || node?.nodeType !== Node.TEXT_NODE || !editor.contains(node)) return false
-    const beforeCaret = node.textContent.slice(0, selection.anchorOffset)
-    let token = beforeCaret.endsWith(';;') ? ';;' : Object.keys(MOBILE_COMMANDS).find((candidate) => beforeCaret.endsWith(candidate))
+    const token = getMobileCommandToken(node.textContent, selection.anchorOffset)
     if (!token) return false
     const tokenStart = selection.anchorOffset - token.length
     if (token !== ';;' && tokenStart > 0 && !/\s/.test(node.textContent[tokenStart - 1])) return false
@@ -84,11 +95,11 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
       const currentModes = mobileModesRef.current
       if (currentModes.includes(command.mode)) {
         mobileModesRef.current = currentModes.filter((mode) => mode !== command.mode)
-        if (command.mode.startsWith('font')) mobileSizeRangeRef.current = null
+        if (isFontMode(command.mode)) mobileSizeRangeRef.current = null
         onMobileCommand?.('mobileEnd', command.mode)
       } else {
-        if (command.mode.startsWith('font')) {
-          mobileModesRef.current = currentModes.filter((mode) => !mode.startsWith('font'))
+        if (isFontMode(command.mode)) {
+          mobileModesRef.current = currentModes.filter((mode) => !isFontMode(mode))
           const startRange = selection.getRangeAt(0).cloneRange()
           startRange.collapse(true)
           mobileSizeRangeRef.current = startRange
@@ -107,7 +118,7 @@ const ArticleBodyEditor = forwardRef(function ArticleBodyEditor({ value, onChang
   }
 
   const applyMobileSizeToInput = (editor) => {
-    const sizeMode = [...mobileModesRef.current].reverse().find((mode) => mode.startsWith('font'))
+    const sizeMode = [...mobileModesRef.current].reverse().find(isFontMode)
     const start = mobileSizeRangeRef.current
     const selection = window.getSelection()
     if (!sizeMode || !start || !selection?.isCollapsed || !editor.contains(selection.anchorNode)) return
