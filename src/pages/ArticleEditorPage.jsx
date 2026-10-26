@@ -209,7 +209,7 @@ export default function ArticleEditorPage({ article, saveStatus, focusMode = fal
       />
       <div className="editor-save-actions-row">
         <Alert
-          className="local-notice editor-save-status"
+          className={`local-notice editor-save-status editor-save-status-${saveStatus}`}
           showIcon
           type={saveStatus === 'error' ? 'error' : saveStatus === 'conflict' ? 'warning' : saveStatus === 'saved' ? 'success' : 'info'}
           message={t(saveStatus === 'error' ? 'Save failed' : saveStatus === 'conflict' ? 'Another tab changed this workspace.' : saveStatus === 'saved' ? 'Saved in this browser' : 'Saving draft...')}

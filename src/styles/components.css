@@ -968,4 +968,8 @@
   .mobile-command-reference p { margin: 8px 0 4px; }
   .mobile-command-reference ul { display: grid; gap: 4px; margin: 0; padding-inline-start: 22px; }
   .mobile-command-reference code { color: var(--ink); font-weight: 700; }
+  .editor-save-status-saved .ant-alert-description,
+  .editor-save-status-saving .ant-alert-description { display: none; }
+  .editor-save-status-saved.ant-alert,
+  .editor-save-status-saving.ant-alert { min-height: 0; padding-block: 9px; }
 }
